@@ -1,27 +1,25 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React from "react";
 
 interface MetricCardProps {
   title: string;
-  icon: string;
-  accentColor: string;
+  icon: React.ComponentType<{ className?: string }>;
   children: React.ReactNode;
 }
 
-export function MetricCard({ title, icon, accentColor, children }: MetricCardProps) {
+export function MetricCard({ title, icon: Icon, children }: MetricCardProps) {
   return (
-    <Card className="bg-[#18181b] border-[#27272a]">
-      <CardHeader className="pb-2">
-        <CardTitle
-          className="text-sm font-medium flex items-center gap-2"
-          style={{ color: accentColor }}
-        >
-          <span>{icon}</span>
+    <div className="bg-[#121217] border border-[#1f1f29] rounded p-2.5 shadow-sm max-h-[160px] flex flex-col justify-between select-none">
+      <div className="flex items-center gap-1.5 border-b border-[#1f1f29]/80 pb-1 mb-1.5 shrink-0">
+        <Icon className="size-3.5 text-[#10b981]" />
+        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
           {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-1.5">{children}</CardContent>
-    </Card>
+        </span>
+      </div>
+      <div className="flex-1 min-h-0 flex flex-col justify-center space-y-1">
+        {children}
+      </div>
+    </div>
   );
 }

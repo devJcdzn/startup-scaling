@@ -1,41 +1,47 @@
 "use client";
 
+import React from "react";
+import { MetricStatus, statusClassName } from "@/lib/metric-status";
+
 interface MetricRowProps {
+  icon: React.ComponentType<{ className?: string }>;
   label: string;
   value: string;
-  status?: "healthy" | "neutral" | "warning" | "critical";
+  subvalue?: string;
+  status?: MetricStatus;
   trend?: "up" | "down" | "stable";
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  healthy: "#22c55e",
-  neutral: "#a1a1aa",
-  warning: "#f59e0b",
-  critical: "#ef4444",
-};
+export function MetricRow({
+  icon: Icon,
+  label,
+  value,
+  subvalue,
+  status = "neutral",
+  trend,
+}: MetricRowProps) {
+  const statusColor = statusClassName[status];
 
-const TREND_ICONS: Record<string, string> = {
-  up: "↑",
-  down: "↓",
-  stable: "—",
-};
-
-export function MetricRow({ label, value, status = "neutral", trend }: MetricRowProps) {
   return (
-    <div className="flex items-center justify-between">
-      <span className="text-xs text-[#a1a1aa]">{label}</span>
-      <div className="flex items-center gap-1.5">
-        {trend && (
-          <span className="text-[10px]" style={{ color: STATUS_COLORS[status] }}>
-            {TREND_ICONS[trend]}
+    <div className="flex items-center justify-between py-1 text-[11px] border-b border-[#1f1f29]/30 last:border-0">
+      <div className="flex items-center gap-2 min-w-0">
+        <Icon className="size-3.5 text-slate-400 shrink-0" />
+        <div className="min-w-0">
+          <span className="text-slate-300 font-medium truncate block">{label}</span>
+          {subvalue && (
+            <span className="text-[9px] text-slate-500 block truncate leading-tight">
+              {subvalue}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="flex items-center gap-1.5 pl-2 shrink-0">
+        <span className={`font-bold ${statusColor}`}>{value}</span>
+        {trend && trend !== "stable" && (
+          <span className={`text-[9px] ${trend === "up" ? "text-emerald-400" : "text-[#f43f5e]"}`}>
+            {trend === "up" ? "▲" : "▼"}
           </span>
         )}
-        <span
-          className="text-sm font-bold tabular-nums"
-          style={{ color: STATUS_COLORS[status] }}
-        >
-          {value}
-        </span>
       </div>
     </div>
   );
