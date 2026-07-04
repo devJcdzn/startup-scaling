@@ -1,0 +1,291 @@
+[
+  {
+    "id": "server_overloaded",
+    "category": "infrastructure",
+    "title": "Server Overloaded!",
+    "description": "Your servers are buckling under traffic. Response times are spiking and users are seeing errors.",
+    "difficultyThreshold": 0.8,
+    "severity": "high",
+    "delayPenalty": {
+      "intervalMs": 3000,
+      "effects": { "performance": -3, "reputation": -2, "techDebt": 2 }
+    },
+    "choices": [
+      { "text": "Scale up servers", "effects": { "money": -300, "performance": 25 } },
+      { "text": "Add caching layer", "effects": { "money": -150, "performance": 15, "techDebt": 5 } },
+      { "text": "Ignore it", "effects": { "performance": -30, "reputation": -20 } }
+    ]
+  },
+  {
+    "id": "slow_database",
+    "category": "infrastructure",
+    "title": "Slow Database",
+    "description": "Queries are taking seconds to complete. Your database is struggling with the load.",
+    "difficultyThreshold": 1.0,
+    "severity": "medium",
+    "delayPenalty": {
+      "intervalMs": 4000,
+      "effects": { "performance": -2, "reputation": -1, "techDebt": 1 }
+    },
+    "choices": [
+      { "text": "Optimize queries", "effects": { "performance": 20, "techDebt": -5 } },
+      { "text": "Add read replicas", "effects": { "money": -250, "performance": 25 } },
+      { "text": "Ignore it", "effects": { "performance": -25, "reputation": -15 } }
+    ]
+  },
+  {
+    "id": "disk_full",
+    "category": "infrastructure",
+    "title": "Disk Space Critical",
+    "description": "Your disk is almost full. New data can't be written and backups are failing.",
+    "difficultyThreshold": 1.5,
+    "severity": "critical",
+    "delayPenalty": {
+      "intervalMs": 2000,
+      "effects": { "performance": -4, "reputation": -3, "techDebt": 2 }
+    },
+    "choices": [
+      { "text": "Upgrade storage", "effects": { "money": -400, "performance": 15 } },
+      { "text": "Clean up old data", "effects": { "performance": 10, "techDebt": 10 } },
+      { "text": "Ignore it", "effects": { "performance": -35, "reputation": -25 } }
+    ]
+  },
+  {
+    "id": "cache_needed",
+    "category": "infrastructure",
+    "title": "Caching Opportunity",
+    "description": "Your app is making redundant database calls. A caching layer could dramatically improve performance.",
+    "difficultyThreshold": 0.9,
+    "severity": "low",
+    "delayPenalty": {
+      "intervalMs": 5000,
+      "effects": { "performance": -1, "techDebt": 1 }
+    },
+    "choices": [
+      { "text": "Implement Redis cache", "effects": { "money": -200, "performance": 25, "techDebt": 5 } },
+      { "text": "Add in-memory cache", "effects": { "performance": 15, "techDebt": 10 } },
+      { "text": "Skip for now", "effects": { "performance": -10 } }
+    ]
+  },
+  {
+    "id": "cdn_needed",
+    "category": "infrastructure",
+    "title": "Global Distribution",
+    "description": "Users worldwide are complaining about slow load times. A CDN would help distribute content globally.",
+    "difficultyThreshold": 1.8,
+    "severity": "medium",
+    "delayPenalty": {
+      "intervalMs": 4000,
+      "effects": { "reputation": -2, "performance": -1 }
+    },
+    "choices": [
+      { "text": "Set up CDN", "effects": { "money": -300, "performance": 30, "reputation": 15 } },
+      { "text": "Optimize assets only", "effects": { "performance": 15, "techDebt": 5 } },
+      { "text": "Ignore it", "effects": { "reputation": -20 } }
+    ]
+  },
+  {
+    "id": "viral_tweet",
+    "category": "growth",
+    "title": "Tweet Went Viral!",
+    "description": "A popular developer just tweeted about your product. Traffic is surging!",
+    "difficultyThreshold": 0.8,
+    "severity": "medium",
+    "delayPenalty": {
+      "intervalMs": 4000,
+      "effects": { "hype": -3, "users": -50 }
+    },
+    "choices": [
+      { "text": "Capitalize on hype", "effects": { "hype": 25, "users": 500, "money": -100 } },
+      { "text": "Focus on retention", "effects": { "hype": 15, "users": 300, "performance": -5 } },
+      { "text": "Let it pass", "effects": { "hype": 10 } }
+    ]
+  },
+  {
+    "id": "product_hunt",
+    "category": "growth",
+    "title": "Featured on Product Hunt",
+    "description": "Your product has been featured on Product Hunt! Expect a surge of early adopters.",
+    "difficultyThreshold": 1.0,
+    "severity": "high",
+    "delayPenalty": {
+      "intervalMs": 3000,
+      "effects": { "hype": -3, "users": -100 }
+    },
+    "choices": [
+      { "text": "Engage with community", "effects": { "hype": 20, "reputation": 15, "users": 800 } },
+      { "text": "Push new features", "effects": { "hype": 15, "users": 400, "techDebt": 10 } },
+      { "text": "Focus on infrastructure", "effects": { "performance": 15, "hype": 10 } }
+    ]
+  },
+  {
+    "id": "hacker_news",
+    "category": "growth",
+    "title": "Hit the Front Page of HN",
+    "description": "Your project made it to the front page of Hacker News. Developers are flocking in.",
+    "difficultyThreshold": 1.3,
+    "severity": "critical",
+    "delayPenalty": {
+      "intervalMs": 2000,
+      "effects": { "hype": -5, "users": -150, "reputation": -2 }
+    },
+    "choices": [
+      { "text": "Open source a feature", "effects": { "hype": 25, "reputation": 20, "users": 1200 } },
+      { "text": "Fix reported issues", "effects": { "performance": 15, "reputation": 15, "users": 600 } },
+      { "text": "Ride the wave", "effects": { "hype": 15, "users": 900 } }
+    ]
+  },
+  {
+    "id": "influencer_recommend",
+    "category": "growth",
+    "title": "Influencer Recommendation",
+    "description": "A tech influencer with 100k followers just recommended your product in a video.",
+    "difficultyThreshold": 1.6,
+    "severity": "high",
+    "delayPenalty": {
+      "intervalMs": 3000,
+      "effects": { "hype": -3, "users": -80 }
+    },
+    "choices": [
+      { "text": "Offer affiliate program", "effects": { "money": -200, "hype": 30, "users": 2000 } },
+      { "text": "Capitalize with content", "effects": { "hype": 20, "reputation": 10, "users": 1000 } },
+      { "text": "Let it pass", "effects": { "hype": 15, "users": 500 } }
+    ]
+  },
+  {
+    "id": "reddit_popular",
+    "category": "growth",
+    "title": "Trending on Reddit",
+    "description": "Your product is gaining traction on r/programming and r/SaaS. Developers are discussing it.",
+    "difficultyThreshold": 1.3,
+    "severity": "medium",
+    "delayPenalty": {
+      "intervalMs": 4000,
+      "effects": { "hype": -2, "users": -60 }
+    },
+    "choices": [
+      { "text": "Engage with comments", "effects": { "hype": 20, "reputation": 15, "users": 700 } },
+      { "text": "Post detailed case study", "effects": { "hype": 15, "reputation": 20, "users": 400 } },
+      { "text": "Ignore it", "effects": { "hype": 10 } }
+    ]
+  },
+  {
+    "id": "dark_mode_request",
+    "category": "product",
+    "title": "Dark Mode Request",
+    "description": "Users are requesting dark mode. It's the most upvoted feature request.",
+    "difficultyThreshold": 1.0,
+    "severity": "low",
+    "delayPenalty": {
+      "intervalMs": 5000,
+      "effects": { "reputation": -2, "hype": -1, "techDebt": 1 }
+    },
+    "choices": [
+      { "text": "Build dark mode", "effects": { "reputation": 20, "hype": 15, "techDebt": 5 } },
+      { "text": "Add to roadmap", "effects": { "reputation": -10 } },
+      { "text": "Ship it fast (hacky)", "effects": { "reputation": 5, "techDebt": 15 } }
+    ]
+  },
+  {
+    "id": "most_wanted_feature",
+    "category": "product",
+    "title": "Most Requested Feature",
+    "description": "Users have been asking for this feature for months. It's time to build it.",
+    "difficultyThreshold": 1.5,
+    "severity": "medium",
+    "delayPenalty": {
+      "intervalMs": 4000,
+      "effects": { "reputation": -2, "hype": -1, "techDebt": 1 }
+    },
+    "choices": [
+      { "text": "Build it properly", "effects": { "reputation": 25, "money": -200, "techDebt": -10 } },
+      { "text": "MVP version", "effects": { "reputation": 15, "techDebt": 10 } },
+      { "text": "Skip it", "effects": { "reputation": -25 } }
+    ]
+  },
+  {
+    "id": "negative_reviews",
+    "category": "product",
+    "title": "Negative Reviews",
+    "description": "Users are leaving negative reviews. They're frustrated with performance and bugs.",
+    "difficultyThreshold": 1.7,
+    "severity": "high",
+    "delayPenalty": {
+      "intervalMs": 3000,
+      "effects": { "reputation": -3, "hype": -2, "techDebt": 1 }
+    },
+    "choices": [
+      { "text": "Fix all bugs", "effects": { "reputation": 25, "performance": 20, "money": -150 } },
+      { "text": "Offer free month", "effects": { "reputation": 15, "money": -300 } },
+      { "text": "Ignore reviews", "effects": { "reputation": -30, "users": -200 } }
+    ]
+  },
+  {
+    "id": "critical_bug",
+    "category": "product",
+    "title": "Critical Bug Found",
+    "description": "A critical bug is causing data loss for some users. This needs immediate attention.",
+    "difficultyThreshold": 1.9,
+    "severity": "critical",
+    "delayPenalty": {
+      "intervalMs": 2000,
+      "effects": { "reputation": -4, "hype": -2, "techDebt": 2, "bugs": 2 }
+    },
+    "choices": [
+      { "text": "Emergency hotfix", "effects": { "performance": 25, "reputation": 15, "money": -100 } },
+      { "text": "Full investigation", "effects": { "performance": 20, "techDebt": -15, "money": -200 } },
+      { "text": "Quick patch", "effects": { "performance": 10, "techDebt": 15 } }
+    ]
+  },
+  {
+    "id": "refactoring_needed",
+    "category": "product",
+    "title": "Technical Debt Crisis",
+    "description": "The codebase is getting unwieldy. New features are taking twice as long to implement.",
+    "difficultyThreshold": 2.0,
+    "severity": "high",
+    "delayPenalty": {
+      "intervalMs": 3000,
+      "effects": { "techDebt": 2, "reputation": -2 }
+    },
+    "choices": [
+      { "text": "Dedicated refactor sprint", "effects": { "techDebt": -25, "performance": 15, "money": -250 } },
+      { "text": "Incremental cleanup", "effects": { "techDebt": -15, "performance": 10 } },
+      { "text": "Ship more features", "effects": { "techDebt": 20, "hype": 10 } }
+    ]
+  },
+  {
+    "id": "investor_appears",
+    "category": "business",
+    "title": "Investor Interest",
+    "description": "A venture capitalist has noticed your growth. They want to discuss an investment.",
+    "difficultyThreshold": 2.0,
+    "severity": "low",
+    "delayPenalty": {
+      "intervalMs": 5000,
+      "effects": { "money": -150, "reputation": -1 }
+    },
+    "choices": [
+      { "text": "Take the meeting", "effects": { "money": 2000, "reputation": 15 } },
+      { "text": "Negotiate better terms", "effects": { "money": 3000, "reputation": -5 } },
+      { "text": "Bootstrapping forever", "effects": { "reputation": 20, "hype": 15 } }
+    ]
+  },
+  {
+    "id": "competitor_launched",
+    "category": "business",
+    "title": "Competitor Launched",
+    "description": "A well-funded competitor just launched a similar product. Some users are considering switching.",
+    "difficultyThreshold": 2.2,
+    "severity": "high",
+    "delayPenalty": {
+      "intervalMs": 3000,
+      "effects": { "money": -150, "reputation": -2 }
+    },
+    "choices": [
+      { "text": "Differentiate with features", "effects": { "money": -300, "reputation": 20, "hype": 15 } },
+      { "text": "Price war", "effects": { "money": -500, "users": 500, "reputation": -15 } },
+      { "text": "Focus on community", "effects": { "reputation": 15, "hype": 20 } }
+    ]
+  }
+]
