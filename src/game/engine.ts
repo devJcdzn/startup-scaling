@@ -5,6 +5,7 @@ import { calculateNewUsers, calculateGrowthMultiplier } from "./growth";
 import { calculateDifficulty } from "./difficulty";
 import { selectEvent } from "./events";
 import { checkWin, checkLoss, checkDeadlineLoss } from "./conditions";
+import { calculateEconomy } from "./economy";
 import eventsData from "./data/events.json";
 
 let rng = mulberry32(42);
@@ -68,10 +69,21 @@ function applyGrowth(state: GameState): GameState {
   return { ...state, users: state.users + newUsers };
 }
 
-function applyRunningCosts(state: GameState): GameState {
+function applyEconomy(state: GameState): GameState {
+  const economy = calculateEconomy(state);
   return {
     ...state,
-    money: state.money - Math.floor(50 + state.users / 100),
+    money: state.money + economy.dailyBalance,
+    payingUsers: economy.payingUsers,
+    mrr: economy.mrr,
+    dailyRevenue: economy.dailyRevenue,
+    dailyExpenses: economy.dailyExpenses,
+    dailyBalance: economy.dailyBalance,
+    runwayDays: economy.runwayDays,
+    conversionRate: economy.conversionRate,
+    arpu: economy.arpu,
+    dailyExpensesBreakdown: economy.dailyExpensesBreakdown,
+    dailyRevenueBreakdown: economy.dailyRevenueBreakdown,
   };
 }
 
@@ -101,7 +113,7 @@ export function tick(state: GameState, now: number): GameState {
 
   next = applyGrowth(next);
   next = applyDailyEffects(next);
-  next = applyRunningCosts(next);
+  next = applyEconomy(next);
   next.difficulty = calculateDifficulty(next.users);
 
   if (next.difficulty > 0.3 && !next.currentEvent) {

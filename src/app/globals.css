@@ -22,61 +22,61 @@
 }
 
 :root {
-  --background: #121214;
+  --background: #0b0b0f;
   --foreground: var(--terminal-text);
   
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
-  /* Modern Warp Terminal Accent (Emerald Green + Charcoal) */
-  --terminal-text: #e2e8f0; /* Crisp slate white for text */
-  --terminal-text-muted: #64748b; /* Slate gray */
-  --terminal-border: #2e2e38; /* Soft charcoal border */
-  --terminal-accent: #10b981; /* Emerald Green */
-  --terminal-bg: #121214; /* Deep charcoal background */
-  --terminal-panel-bg: #1a1a1e; /* Sleek card background */
+  /* Modern Executive SaaS Accent (Emerald Green + Charcoal) */
+  --terminal-text: #f3f4f6; /* Crisp slate white for text */
+  --terminal-text-muted: #9ca3af; /* Slate gray */
+  --terminal-border: #1f1f29; /* Ultra-thin border */
+  --terminal-accent: #10b981; /* Stripe Emerald Green */
+  --terminal-bg: #0b0b0f; /* Deep minimalist dark background */
+  --terminal-panel-bg: #121217; /* Sleek card background */
 
-  /* Map shadcn theme variables to modern terminal variables */
-  --card: #1a1a1e;
+  /* Map shadcn theme variables */
+  --card: #121217;
   --card-foreground: var(--terminal-text);
-  --popover: #1a1a1e;
+  --popover: #121217;
   --popover-foreground: var(--terminal-text);
   --primary: var(--terminal-accent);
-  --primary-foreground: #121214;
-  --secondary: #232329;
+  --primary-foreground: #0b0b0f;
+  --secondary: #1a1a24;
   --secondary-foreground: var(--terminal-text);
-  --muted: #232329;
+  --muted: #1a1a24;
   --muted-foreground: var(--terminal-text-muted);
   --accent: var(--terminal-accent);
-  --accent-foreground: #121214;
-  --destructive: #f43f5e; /* Rose red */
+  --accent-foreground: #0b0b0f;
+  --destructive: #f43f5e; /* Stripe Crimson */
   --border: var(--terminal-border);
-  --input: #1a1a1e;
+  --input: #121217;
   --ring: var(--terminal-accent);
-  --radius: 4px;
+  --radius: 6px;
 }
 
 .theme-amber {
-  --terminal-accent: #f59e0b; /* Amber */
+  --terminal-accent: #f59e0b; /* Amber risk */
 }
 
 .theme-cyan {
-  --terminal-accent: #06b6d4; /* Cyan */
+  --terminal-accent: #3b82f6; /* SaaS Blue */
 }
 
 @layer base {
   * {
-    border-radius: 4px !important;
+    border-radius: 6px !important;
     border-color: var(--terminal-border) !important;
   }
   
   html, body, button, input, select, textarea {
     font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
-    background-color: #121214;
+    background-color: #0b0b0f;
     color: var(--terminal-text);
   }
 
   body {
-    background-color: #121214;
+    background-color: #0b0b0f;
     color: var(--terminal-text);
     overflow: hidden; /* Strict viewport lock to 100vh */
     height: 100vh;

@@ -2,117 +2,120 @@
 
 import { useGameStore, useGameStats } from "@/game/store/game-store";
 import { useSound } from "@/hooks/use-sound";
-import { TerminalPanel } from "@/components/ui/terminal-panel";
-import { useEffect } from "react";
-import { clearTerminalLogs } from "@/hooks/use-terminal-logs";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { STRINGS } from "@/game/content/strings";
+
+function formatNumber(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return n.toLocaleString();
+}
+
+function formatMoney(n: number): string {
+  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}K`;
+  return `$${n.toLocaleString()}`;
+}
 
 export function VictoryScreen() {
   const restart = useGameStore((s) => s.restart);
   const stats = useGameStats();
   const { playClick } = useSound();
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Enter") {
-        playClick();
-        clearTerminalLogs();
-        restart();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [restart, playClick]);
-
   return (
-    <div className="h-screen w-screen flex flex-col items-center justify-center p-6 bg-[#121214] font-mono text-[#e2e8f0] selection:bg-primary selection:text-[#121214]">
-      <div className="w-full max-w-lg space-y-6">
-        
-        {/* Terminal Header */}
-        <div className="flex justify-between items-center text-[10px] text-slate-500 border-b border-[#2e2e38] pb-2">
-          <div>SESSION: LOCALHOST://AUDIT-REPORT-DAEMON</div>
-          <div>STATUS: SUCCESSFUL_RUN</div>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-[#09090b]">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="w-full max-w-md space-y-6"
+      >
+        <div className="text-center space-y-2">
+          <motion.h1
+            className="text-4xl font-bold text-[#22c55e]"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            {STRINGS.victory.title}
+          </motion.h1>
+          <motion.p
+            className="text-sm text-[#a1a1aa]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            {STRINGS.victory.message}
+          </motion.p>
         </div>
 
-        {/* Victory JSON Report Panel */}
-        <TerminalPanel title="audit_result" className="w-full shadow-lg">
-          <div className="space-y-4 text-left py-2">
-            
-            {/* Command Trigger */}
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-xs">
-                <span className="text-primary font-bold">$</span>
-                <span className="text-white font-bold">cat /var/log/startup-outcome.json</span>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Card className="bg-[#18181b] border-[#27272a]">
+            <CardContent className="p-4 space-y-3">
+              <div className="text-[10px] text-[#52525b] uppercase font-bold tracking-wider">
+                Run Summary
               </div>
-            </div>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <span className="text-[#a1a1aa]">Result</span>
+                  <div className="font-bold text-[#22c55e]">Won</div>
+                </div>
+                <div>
+                  <span className="text-[#a1a1aa]">Survived</span>
+                  <div className="font-bold text-[#fafafa]">30 / 30 days</div>
+                </div>
+                <div>
+                  <span className="text-[#a1a1aa]">Peak Users</span>
+                  <div className="font-bold text-[#3b82f6]">{formatNumber(stats.users)}</div>
+                </div>
+                <div>
+                  <span className="text-[#a1a1aa]">Final MRR</span>
+                  <div className="font-bold text-[#22c55e]">{formatMoney(stats.mrr)}</div>
+                </div>
+                <div>
+                  <span className="text-[#a1a1aa]">Final Cash</span>
+                  <div className="font-bold text-[#fafafa]">{formatMoney(stats.money)}</div>
+                </div>
+                <div>
+                  <span className="text-[#a1a1aa]">Performance</span>
+                  <div className="font-bold text-[#f59e0b]">{stats.performance}%</div>
+                </div>
+                <div>
+                  <span className="text-[#a1a1aa]">Reputation</span>
+                  <div className="font-bold text-[#8b5cf6]">{stats.reputation}%</div>
+                </div>
+                <div>
+                  <span className="text-[#a1a1aa]">Tech Debt</span>
+                  <div className="font-bold text-[#ec4899]">{stats.techDebt}%</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-            {/* JSON Code block */}
-            <pre className="text-xs p-4 bg-[#141417] border border-[#2e2e38] leading-relaxed overflow-x-auto whitespace-pre font-mono">
-              <div>{`{`}</div>
-              <div className="pl-4">
-                <span className="text-rose-400">&quot;status&quot;</span>: <span className="text-primary">&quot;SUCCESSFUL_EXIT_CODE_0&quot;</span>,
-              </div>
-              <div className="pl-4 text-slate-400">
-                <span className="text-rose-400">&quot;summary&quot;</span>: <span className="text-amber-300">&quot;Startup successfully scaled past growth milestone.&quot;</span>,
-              </div>
-              <div className="pl-4">
-                <span className="text-rose-400">&quot;telemetry&quot;</span>: {`{`}
-              </div>
-              <div className="pl-8">
-                <span className="text-rose-400">&quot;active_users&quot;</span>: <span className="text-cyan-400">{stats.users.toLocaleString()}</span>,
-              </div>
-              <div className="pl-8">
-                <span className="text-rose-400">&quot;liquid_cash&quot;</span>: <span className="text-cyan-400">${stats.money.toLocaleString()}</span>,
-              </div>
-              <div className="pl-8">
-                <span className="text-rose-400">&quot;reputation_rating&quot;</span>: <span className="text-cyan-400">{stats.reputation}</span>,
-              </div>
-              <div className="pl-8">
-                <span className="text-rose-400">&quot;duration_days&quot;</span>: <span className="text-cyan-400">30</span>,
-              </div>
-              <div className="pl-8">
-                <span className="text-rose-400">&quot;technical_debt&quot;</span>: <span className="text-cyan-400">{stats.techDebt}%</span>,
-              </div>
-              <div className="pl-8">
-                <span className="text-rose-400">&quot;pending_bug_count&quot;</span>: <span className="text-cyan-400">{stats.bugs}</span>
-              </div>
-              <div className="pl-4">{`}`}</div>
-              <div>{`}`}</div>
-            </pre>
-
-            {/* Restart Prompts */}
-            <div className="pt-2 space-y-3">
-              <div className="flex items-center gap-2 text-xs">
-                <span className="text-primary font-bold">$</span>
-                <span className="text-slate-300">npm run restart</span>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                <button
-                  className="px-5 py-2 bg-primary text-[#121214] font-bold text-xs hover:bg-primary/90 active:translate-y-px transition-all cursor-pointer border border-primary font-mono rounded"
-                  onClick={() => {
-                    playClick();
-                    clearTerminalLogs();
-                    restart();
-                  }}
-                >
-                  [ REBOOT_SIMULATOR ]
-                </button>
-                
-                <span className="text-[10px] text-slate-500 cursor-default animate-pulse">
-                  (Or press Enter to execute)
-                </span>
-              </div>
-            </div>
-
-          </div>
-        </TerminalPanel>
-
-        {/* Footer info */}
-        <div className="text-center text-[10px] text-slate-500">
-          REPORT GENERATED // PROCESS EXITED SUCCESSFULLY
-        </div>
-
-      </div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="text-center"
+        >
+          <Button
+            size="lg"
+            className="bg-[#22c55e] hover:bg-[#16a34a] text-white font-bold"
+            onClick={() => {
+              playClick();
+              restart();
+            }}
+          >
+            Play Again
+          </Button>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

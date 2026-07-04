@@ -1,3 +1,8 @@
+import type {
+  DailyExpensesBreakdown,
+  DailyRevenueBreakdown,
+} from "./economy/types";
+
 export type StatKey =
   | "users"
   | "money"
@@ -36,7 +41,17 @@ export interface GameState {
   status: GameStatus;
   day: number;
   users: number;
+  payingUsers: number;
   money: number;
+  mrr: number;
+  dailyRevenue: number;
+  dailyExpenses: number;
+  dailyBalance: number;
+  runwayDays: number | "profitable";
+  conversionRate: number;
+  arpu: number;
+  dailyExpensesBreakdown: DailyExpensesBreakdown;
+  dailyRevenueBreakdown: DailyRevenueBreakdown;
   performance: number;
   reputation: number;
   hype: number;
@@ -53,13 +68,40 @@ export interface GameState {
 
 export const DAY_DURATION_MS = 6000;
 
+const defaultExpensesBreakdown: DailyExpensesBreakdown = {
+  base: 20,
+  infrastructure: 5,
+  techDebt: 0,
+  bugs: 0,
+  performance: 0,
+  total: 25,
+};
+
+const defaultRevenueBreakdown: DailyRevenueBreakdown = {
+  payingUsers: 2,
+  conversionRate: 0.02,
+  arpu: 29,
+  mrr: 58,
+  dailyRevenue: 1,
+};
+
 export const INITIAL_STATE: Omit<
   GameState,
   "status" | "difficulty" | "timeAccumulator"
 > = {
   day: 1,
   users: 100,
-  money: 1000,
+  payingUsers: 2,
+  money: 5000,
+  mrr: 58,
+  dailyRevenue: 1,
+  dailyExpenses: 25,
+  dailyBalance: -24,
+  runwayDays: 208,
+  conversionRate: 0.02,
+  arpu: 29,
+  dailyExpensesBreakdown: defaultExpensesBreakdown,
+  dailyRevenueBreakdown: defaultRevenueBreakdown,
   performance: 80,
   reputation: 80,
   hype: 20,
