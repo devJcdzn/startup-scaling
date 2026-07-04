@@ -2,87 +2,117 @@
 
 import { useGameStore, useGameStats } from "@/game/store/game-store";
 import { useSound } from "@/hooks/use-sound";
-import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-
-function formatNumber(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return n.toLocaleString();
-}
+import { TerminalPanel } from "@/components/ui/terminal-panel";
+import { useEffect } from "react";
+import { clearTerminalLogs } from "@/hooks/use-terminal-logs";
 
 export function VictoryScreen() {
   const restart = useGameStore((s) => s.restart);
   const stats = useGameStats();
-  const { playClick, playSuccess } = useSound();
+  const { playClick } = useSound();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        playClick();
+        clearTerminalLogs();
+        restart();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [restart, playClick]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="flex flex-col items-center justify-center min-h-screen px-4"
-    >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ type: "spring", stiffness: 200, damping: 15 }}
-        className="text-center space-y-8"
-      >
-        <motion.h1
-          className="text-6xl md:text-8xl font-bold text-[#22c55e]"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          VICTORY!
-        </motion.h1>
+    <div className="h-screen w-screen flex flex-col items-center justify-center p-6 bg-[#121214] font-mono text-[#e2e8f0] selection:bg-primary selection:text-[#121214]">
+      <div className="w-full max-w-lg space-y-6">
+        
+        {/* Terminal Header */}
+        <div className="flex justify-between items-center text-[10px] text-slate-500 border-b border-[#2e2e38] pb-2">
+          <div>SESSION: LOCALHOST://AUDIT-REPORT-DAEMON</div>
+          <div>STATUS: SUCCESSFUL_RUN</div>
+        </div>
 
-        <motion.p
-          className="text-xl text-[#a1a1aa]"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-        >
-          You survived 30 days and reached {formatNumber(stats.users)} users!
-        </motion.p>
+        {/* Victory JSON Report Panel */}
+        <TerminalPanel title="audit_result" className="w-full shadow-lg">
+          <div className="space-y-4 text-left py-2">
+            
+            {/* Command Trigger */}
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-primary font-bold">$</span>
+                <span className="text-white font-bold">cat /var/log/startup-outcome.json</span>
+              </div>
+            </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="grid grid-cols-3 gap-4 max-w-md mx-auto text-center"
-        >
-          <div className="bg-[#18181b] border border-[#27272a] rounded-lg p-4">
-            <div className="text-2xl font-bold text-[#3b82f6]">{formatNumber(stats.users)}</div>
-            <div className="text-xs text-[#a1a1aa]">Users</div>
-          </div>
-          <div className="bg-[#18181b] border border-[#27272a] rounded-lg p-4">
-            <div className="text-2xl font-bold text-[#22c55e]">${stats.money.toLocaleString()}</div>
-            <div className="text-xs text-[#a1a1aa]">Money</div>
-          </div>
-          <div className="bg-[#18181b] border border-[#27272a] rounded-lg p-4">
-            <div className="text-2xl font-bold text-[#8b5cf6]">{stats.reputation}</div>
-            <div className="text-xs text-[#a1a1aa]">Reputation</div>
-          </div>
-        </motion.div>
+            {/* JSON Code block */}
+            <pre className="text-xs p-4 bg-[#141417] border border-[#2e2e38] leading-relaxed overflow-x-auto whitespace-pre font-mono">
+              <div>{`{`}</div>
+              <div className="pl-4">
+                <span className="text-rose-400">&quot;status&quot;</span>: <span className="text-primary">&quot;SUCCESSFUL_EXIT_CODE_0&quot;</span>,
+              </div>
+              <div className="pl-4 text-slate-400">
+                <span className="text-rose-400">&quot;summary&quot;</span>: <span className="text-amber-300">&quot;Startup successfully scaled past growth milestone.&quot;</span>,
+              </div>
+              <div className="pl-4">
+                <span className="text-rose-400">&quot;telemetry&quot;</span>: {`{`}
+              </div>
+              <div className="pl-8">
+                <span className="text-rose-400">&quot;active_users&quot;</span>: <span className="text-cyan-400">{stats.users.toLocaleString()}</span>,
+              </div>
+              <div className="pl-8">
+                <span className="text-rose-400">&quot;liquid_cash&quot;</span>: <span className="text-cyan-400">${stats.money.toLocaleString()}</span>,
+              </div>
+              <div className="pl-8">
+                <span className="text-rose-400">&quot;reputation_rating&quot;</span>: <span className="text-cyan-400">{stats.reputation}</span>,
+              </div>
+              <div className="pl-8">
+                <span className="text-rose-400">&quot;duration_days&quot;</span>: <span className="text-cyan-400">30</span>,
+              </div>
+              <div className="pl-8">
+                <span className="text-rose-400">&quot;technical_debt&quot;</span>: <span className="text-cyan-400">{stats.techDebt}%</span>,
+              </div>
+              <div className="pl-8">
+                <span className="text-rose-400">&quot;pending_bug_count&quot;</span>: <span className="text-cyan-400">{stats.bugs}</span>
+              </div>
+              <div className="pl-4">{`}`}</div>
+              <div>{`}`}</div>
+            </pre>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-        >
-          <Button
-            size="lg"
-            className="text-lg px-12 py-6 bg-[#22c55e] hover:bg-[#16a34a] text-white font-semibold"
-            onClick={() => {
-              playClick();
-              restart();
-            }}
-          >
-            Play Again
-          </Button>
-        </motion.div>
-      </motion.div>
-    </motion.div>
+            {/* Restart Prompts */}
+            <div className="pt-2 space-y-3">
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-primary font-bold">$</span>
+                <span className="text-slate-300">npm run restart</span>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <button
+                  className="px-5 py-2 bg-primary text-[#121214] font-bold text-xs hover:bg-primary/90 active:translate-y-px transition-all cursor-pointer border border-primary font-mono rounded"
+                  onClick={() => {
+                    playClick();
+                    clearTerminalLogs();
+                    restart();
+                  }}
+                >
+                  [ REBOOT_SIMULATOR ]
+                </button>
+                
+                <span className="text-[10px] text-slate-500 cursor-default animate-pulse">
+                  (Or press Enter to execute)
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </TerminalPanel>
+
+        {/* Footer info */}
+        <div className="text-center text-[10px] text-slate-500">
+          REPORT GENERATED // PROCESS EXITED SUCCESSFULLY
+        </div>
+
+      </div>
+    </div>
   );
 }

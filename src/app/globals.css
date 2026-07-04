@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;650;700&family=JetBrains+Mono:ital,wght@0,300..800;1,300..800&display=swap');
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -7,133 +9,118 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --color-success: var(--success);
-  --color-danger: var(--danger);
-  --color-warning: var(--warning);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --font-sans: var(--font-mono);
+  --font-mono: var(--font-mono);
+  --font-heading: var(--font-mono);
+  --color-primary-foreground: #121214;
+  --color-primary: var(--terminal-accent);
+  --color-border: var(--terminal-border);
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --success: oklch(0.723 0.219 149.579);
-  --danger: oklch(0.637 0.237 25.331);
-  --warning: oklch(0.769 0.188 70.08);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --background: #121214;
+  --foreground: var(--terminal-text);
+  
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Modern Warp Terminal Accent (Emerald Green + Charcoal) */
+  --terminal-text: #e2e8f0; /* Crisp slate white for text */
+  --terminal-text-muted: #64748b; /* Slate gray */
+  --terminal-border: #2e2e38; /* Soft charcoal border */
+  --terminal-accent: #10b981; /* Emerald Green */
+  --terminal-bg: #121214; /* Deep charcoal background */
+  --terminal-panel-bg: #1a1a1e; /* Sleek card background */
+
+  /* Map shadcn theme variables to modern terminal variables */
+  --card: #1a1a1e;
+  --card-foreground: var(--terminal-text);
+  --popover: #1a1a1e;
+  --popover-foreground: var(--terminal-text);
+  --primary: var(--terminal-accent);
+  --primary-foreground: #121214;
+  --secondary: #232329;
+  --secondary-foreground: var(--terminal-text);
+  --muted: #232329;
+  --muted-foreground: var(--terminal-text-muted);
+  --accent: var(--terminal-accent);
+  --accent-foreground: #121214;
+  --destructive: #f43f5e; /* Rose red */
+  --border: var(--terminal-border);
+  --input: #1a1a1e;
+  --ring: var(--terminal-accent);
+  --radius: 4px;
 }
 
-.dark {
-  --background: #09090b;
-  --foreground: #fafafa;
-  --card: #18181b;
-  --card-foreground: #fafafa;
-  --popover: #18181b;
-  --popover-foreground: #fafafa;
-  --primary: #3b82f6;
-  --primary-foreground: #fafafa;
-  --secondary: #27272a;
-  --secondary-foreground: #fafafa;
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
-  --accent: #27272a;
-  --accent-foreground: #fafafa;
-  --destructive: #ef4444;
-  --border: #27272a;
-  --input: #27272a;
-  --ring: #3b82f6;
-  --success: #22c55e;
-  --danger: #ef4444;
-  --warning: #f59e0b;
-  --chart-1: #3b82f6;
-  --chart-2: #22c55e;
-  --chart-3: #f59e0b;
-  --chart-4: #ef4444;
-  --chart-5: #8b5cf6;
-  --sidebar: #18181b;
-  --sidebar-foreground: #fafafa;
-  --sidebar-primary: #3b82f6;
-  --sidebar-primary-foreground: #fafafa;
-  --sidebar-accent: #27272a;
-  --sidebar-accent-foreground: #fafafa;
-  --sidebar-border: #27272a;
-  --sidebar-ring: #3b82f6;
+.theme-amber {
+  --terminal-accent: #f59e0b; /* Amber */
+}
+
+.theme-cyan {
+  --terminal-accent: #06b6d4; /* Cyan */
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-radius: 4px !important;
+    border-color: var(--terminal-border) !important;
   }
+  
+  html, body, button, input, select, textarea {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+    background-color: #121214;
+    color: var(--terminal-text);
+  }
+
   body {
-    @apply bg-background text-foreground;
+    background-color: #121214;
+    color: var(--terminal-text);
+    overflow: hidden; /* Strict viewport lock to 100vh */
+    height: 100vh;
+    width: 100vw;
   }
-  html {
-    @apply font-sans;
+}
+
+/* Sleek Warp-like Custom Scrollbar */
+.scroller {
+  --scrollbar-thumb: #3e3e4a;
+  --scrollbar-track: #121214;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  scrollbar-width: thin;
+}
+
+@supports not (scrollbar-color: auto) {
+  .scroller::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
   }
+  .scroller::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 2px;
+  }
+  .scroller::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+}
+
+/* Blinking cursor animation */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Code Prompt inputs styling */
+.cli-prompt {
+  background: transparent;
+  outline: none;
+  border: none;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--terminal-text);
 }
