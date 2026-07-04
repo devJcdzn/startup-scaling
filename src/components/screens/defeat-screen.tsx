@@ -14,11 +14,15 @@ function formatNumber(n: number): string {
 function getDefeatReason(
   money: number,
   performance: number,
-  reputation: number
+  reputation: number,
+  day: number,
+  users: number
 ): string {
   if (money <= 0) return "You ran out of money.";
   if (performance <= 0) return "Performance hit zero. Users fled.";
   if (reputation <= 0) return "Your reputation was destroyed.";
+  if (day >= 30 && users < 1_000_000)
+    return "Time's up! You only reached " + users.toLocaleString() + " users.";
   return "Game over.";
 }
 
@@ -54,7 +58,7 @@ export function DefeatScreen() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          {getDefeatReason(stats.money, stats.performance, stats.reputation)}
+          {getDefeatReason(stats.money, stats.performance, stats.reputation, stats.day, stats.users)}
         </motion.p>
 
         <motion.div

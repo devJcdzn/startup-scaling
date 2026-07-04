@@ -68,9 +68,9 @@ export function StartScreen() {
         >
           <span>30 Days</span>
           <span>•</span>
-          <span>6 Stats</span>
+          <span>7 Stats</span>
           <span>•</span>
-          <span>15 Events</span>
+          <span>17 Events</span>
         </motion.div>
       </motion.div>
     </motion.div>
