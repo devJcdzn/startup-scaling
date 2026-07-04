@@ -2,6 +2,8 @@ import type {
   DailyExpensesBreakdown,
   DailyRevenueBreakdown,
 } from "./economy/types";
+import type { ActiveModifier } from "./modifiers/types";
+import type { DecisionImpact } from "./decisions/types";
 
 export type StatKey =
   | "users"
@@ -16,7 +18,9 @@ export type StatChange = Partial<Record<StatKey, number>>;
 
 export interface Choice {
   text: string;
+  description?: string;
   effects: StatChange;
+  impact?: DecisionImpact;
 }
 
 export interface DelayPenalty {
@@ -61,6 +65,7 @@ export interface GameState {
   currentEvent: GameEvent | null;
   pendingEffects: StatChange[] | null;
   usedEvents: string[];
+  activeModifiers: ActiveModifier[];
   timeScale: number;
   timeAccumulator: number;
   lastPenaltyTime: number;
@@ -110,6 +115,7 @@ export const INITIAL_STATE: Omit<
   currentEvent: null,
   pendingEffects: null,
   usedEvents: [],
+  activeModifiers: [],
   timeScale: 1.0,
   lastPenaltyTime: 0,
 };

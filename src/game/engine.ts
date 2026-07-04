@@ -6,6 +6,8 @@ import { calculateDifficulty } from "./difficulty";
 import { selectEvent } from "./events";
 import { checkWin, checkLoss, checkDeadlineLoss } from "./conditions";
 import { calculateEconomy } from "./economy";
+import { applyActiveModifiers } from "./modifiers/apply-modifiers";
+import { expireModifiers } from "./modifiers/expire-modifiers";
 import eventsData from "./data/events.json";
 
 let rng = mulberry32(42);
@@ -112,9 +114,12 @@ export function tick(state: GameState, now: number): GameState {
   let next = applyDelayPenalty(state, now);
 
   next = applyGrowth(next);
+  next = applyActiveModifiers(next, next.activeModifiers);
   next = applyDailyEffects(next);
   next = applyEconomy(next);
   next.difficulty = calculateDifficulty(next.users);
+
+  next.activeModifiers = expireModifiers(next.activeModifiers, next.day);
 
   if (next.difficulty > 0.3 && !next.currentEvent) {
     const shouldTrigger = rngInt(rng, 1, 100) <= 45;
@@ -159,8 +164,6 @@ export function applyChoice(
   const choice = state.currentEvent.choices[choiceIndex];
   if (!choice) return state;
 
-  const effects: StatChange[] = [choice.effects];
-
   let next: GameState = {
     ...state,
     users: state.users + (choice.effects.users ?? 0),
@@ -172,11 +175,21 @@ export function applyChoice(
     bugs: state.bugs + (choice.effects.bugs ?? 0),
     usedEvents: [...state.usedEvents, state.currentEvent.id],
     currentEvent: null,
-    pendingEffects: effects,
+    pendingEffects: [{ ...choice.effects }],
     timeScale: 1.0,
     lastPenaltyTime: 0,
     status: "running",
   };
+
+  if (choice.impact?.modifiers) {
+    next.activeModifiers = [
+      ...next.activeModifiers,
+      ...choice.impact.modifiers.map((m) => ({
+        ...m,
+        startedAtDay: state.day,
+      })),
+    ];
+  }
 
   next.difficulty = calculateDifficulty(next.users);
 
