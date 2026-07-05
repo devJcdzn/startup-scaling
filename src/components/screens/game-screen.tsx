@@ -8,6 +8,7 @@ import { CurrentEventPanel } from "@/components/game/current-event-panel";
 import { ActivityLogPanel } from "@/components/game/activity-log-panel";
 import { DecisionForecastPanel } from "@/components/game/panels/decision-forecast-panel";
 import { ActiveEffectsPanel } from "@/components/game/panels/active-effects-panel";
+import { AtRiskPanel } from "@/components/game/at-risk-panel";
 import { FeedbackPopup } from "@/components/feedback/feedback-popup";
 import { useSound } from "@/hooks/use-sound";
 import { useTerminalLogs, addTerminalLog } from "@/hooks/use-terminal-logs";
@@ -222,6 +223,7 @@ export function GameScreen() {
               effects={hoveredChoice}
               stats={stats}
             />
+            <AtRiskPanel />
             <ActiveEffectsPanel stats={stats} />
             <div className="flex-1 min-h-0 flex flex-col">
               <ActivityLogPanel logs={logs} />

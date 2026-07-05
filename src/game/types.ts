@@ -16,9 +16,25 @@ export type StatKey =
 
 export type StatChange = Partial<Record<StatKey, number>>;
 
+export type DecisionType = "safe" | "tactical" | "critical" | "gamble";
+export type ImpactLevel = "low" | "medium" | "high" | "run-ending";
+export type ToastCategory =
+  | "investment"
+  | "tradeoff"
+  | "incident"
+  | "risk"
+  | "growth"
+  | "economy"
+  | "success"
+  | "warning";
+
 export interface Choice {
   text: string;
   description?: string;
+  tradeOff?: string;
+  decisionType?: DecisionType;
+  impactLevel?: ImpactLevel;
+  affects?: string[];
   effects: StatChange;
   impact?: DecisionImpact;
 }

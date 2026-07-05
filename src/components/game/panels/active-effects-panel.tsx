@@ -181,8 +181,11 @@ export function ActiveEffectsPanel({ stats }: ActiveEffectsPanelProps) {
                   <TrendingDown className="size-2.5 shrink-0" />
                 )}
                 <div className="flex-1 flex items-center justify-between min-w-0">
-                  <span className="font-bold truncate max-w-[120px] uppercase tracking-wide">{eff.label}</span>
+                  <span className="font-bold truncate max-w-[100px] uppercase tracking-wide">{eff.label}</span>
                   <span className="truncate opacity-80 text-[8px] ml-1.5">{eff.desc}</span>
+                  {eff.remaining !== undefined && (
+                    <span className="text-[7px] opacity-60 ml-1 shrink-0">{eff.remaining}d</span>
+                  )}
                 </div>
               </div>
             ))}

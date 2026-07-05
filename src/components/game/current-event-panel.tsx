@@ -24,6 +24,10 @@ interface GameEvent {
   choices: Array<{
     text: string;
     description?: string;
+    tradeOff?: string;
+    decisionType?: "safe" | "tactical" | "critical" | "gamble";
+    impactLevel?: "low" | "medium" | "high" | "run-ending";
+    affects?: string[];
     effects: Record<string, number>;
   }>;
   delayPenalty?: {
@@ -351,9 +355,24 @@ export function CurrentEventPanel({
                 >
                   <div className="space-y-1.5">
                     <div className="flex justify-between items-center">
-                      <span className="px-1.5 py-0.5 rounded text-[8px] font-bold uppercase text-purple-400 bg-purple-500/10 border border-purple-500/20">
-                        EVENT CHOICE
+                      <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase ${
+                        choice.decisionType === "safe" ? "text-emerald-400 bg-emerald-500/10 border border-emerald-500/20" :
+                        choice.decisionType === "tactical" ? "text-blue-400 bg-blue-500/10 border border-blue-500/20" :
+                        choice.decisionType === "critical" ? "text-rose-400 bg-rose-500/10 border border-rose-500/20" :
+                        "text-amber-400 bg-amber-500/10 border border-amber-500/20"
+                      }`}>
+                        {choice.decisionType?.toUpperCase() || "ACTION"}
                       </span>
+                      {choice.impactLevel && (
+                        <span className={`text-[8px] font-bold uppercase ${
+                          choice.impactLevel === "run-ending" ? "text-rose-400 animate-pulse" :
+                          choice.impactLevel === "high" ? "text-orange-400" :
+                          choice.impactLevel === "medium" ? "text-amber-400" :
+                          "text-slate-500"
+                        }`}>
+                          {choice.impactLevel === "run-ending" ? "⚠ RUN-ENDING" : choice.impactLevel}
+                        </span>
+                      )}
                     </div>
                     <span className="block text-[10px] font-bold text-white uppercase tracking-wide truncate">
                       {choice.text}
@@ -361,11 +380,23 @@ export function CurrentEventPanel({
                     <p className="text-[9px] text-slate-500 line-clamp-2 leading-relaxed">
                       {choice.description || "Deploy operations to resolve active incident variables."}
                     </p>
+                    {choice.tradeOff && (
+                      <p className="text-[9px] text-[#10b981] italic line-clamp-1">
+                        {choice.tradeOff}
+                      </p>
+                    )}
                   </div>
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {Object.entries(choice.effects).map(([metric, val]) => (
-                      <ImpactChip key={metric} metric={metric} value={val} />
-                    ))}
+                  <div className="space-y-1 mt-2">
+                    {choice.affects && choice.affects.length > 0 && (
+                      <div className="text-[8px] text-slate-600">
+                        Affects: {choice.affects.join(" · ")}
+                      </div>
+                    )}
+                    <div className="flex flex-wrap gap-1">
+                      {Object.entries(choice.effects).map(([metric, val]) => (
+                        <ImpactChip key={metric} metric={metric} value={val} />
+                      ))}
+                    </div>
                   </div>
                 </button>
               ))
