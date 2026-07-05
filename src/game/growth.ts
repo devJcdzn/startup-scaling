@@ -9,6 +9,8 @@ export function calculateGrowthMultiplier(
   if (reputation <= 20) multiplier -= 0.5;
   else if (reputation <= 40) multiplier -= 0.25;
   else if (reputation <= 60) multiplier -= 0.1;
+  else if (reputation >= 85) multiplier += 0.15;
+  else if (reputation >= 70) multiplier += 0.05;
 
   if (hype >= 80) multiplier += 0.4;
   else if (hype >= 60) multiplier += 0.2;

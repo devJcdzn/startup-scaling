@@ -2,142 +2,145 @@
 
 import { useGameStore, useGameStats } from "@/game/store/game-store";
 import { useSound } from "@/hooks/use-sound";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { motion } from "framer-motion";
-import { STRINGS } from "@/game/content/strings";
-
-function formatNumber(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return n.toLocaleString();
-}
-
-function formatMoney(n: number): string {
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}K`;
-  return `$${n.toLocaleString()}`;
-}
-
-function getDefeatInfo(
-  money: number,
-  performance: number,
-  reputation: number,
-  day: number,
-  users: number
-): { title: string; message: string; reason: string } {
-  if (money <= 0) return { ...STRINGS.defeat.cash, reason: "Ran out of cash" };
-  if (performance <= 0) return { ...STRINGS.defeat.performance, reason: "Performance collapsed" };
-  if (reputation <= 0) return { ...STRINGS.defeat.reputation, reason: "Reputation destroyed" };
-  if (day >= 30 && users < 1_000_000) return { ...STRINGS.defeat.deadline, reason: "Didn't scale enough" };
-  return { title: "Game Over", message: "Something went wrong.", reason: "Unknown" };
-}
+import { useEffect, useState } from "react";
+import { formatCurrency, formatCompactNumber } from "@/lib/formatters";
+import { AlertOctagon, Share2 } from "lucide-react";
 
 export function DefeatScreen() {
   const restart = useGameStore((s) => s.restart);
   const stats = useGameStats();
   const { playClick } = useSound();
+  const [copied, setCopied] = useState(false);
 
-  const defeat = getDefeatInfo(
-    stats.money,
-    stats.performance,
-    stats.reputation,
-    stats.day,
-    stats.users
-  );
+  // Determine defeat cause
+  const getDefeatCause = () => {
+    if (stats.money <= 0) return { title: "Ran out of cash", desc: "Your operating costs and penalty bills drained liquid capital reserves.", main: "Cash balance hit zero." };
+    if (stats.performance <= 0) return { title: "Product collapsed", desc: "Critical platform instability drove service downtime past recovery.", main: "Stability hit zero." };
+    if (stats.reputation <= 0) return { title: "Users lost trust", desc: "Negative security incidents and bad service quality destroyed market reputation.", main: "Reputation hit zero." };
+    return { title: "Failed to scale", desc: "You reached day 30, but could not capture the targeted 1M active customers.", main: "Insufficient market scale." };
+  };
+
+  const cause = getDefeatCause();
+
+  // Grade calculation
+  const getGrade = () => {
+    if (stats.day >= 25) return "D";
+    if (stats.day >= 15) return "F+";
+    return "F";
+  };
+
+  const finalGrade = getGrade();
+
+  useEffect(() => {
+    // Save last run telemetry
+    const lastRunSummary = {
+      day: stats.day,
+      result: "lost",
+      cause: cause.title,
+      users: stats.users,
+    };
+    localStorage.setItem("bos-last-run", JSON.stringify(lastRunSummary));
+  }, [stats.day, cause.title, stats.users]);
+
+  const handleShare = () => {
+    playClick();
+    const text = `Battle of Scaling — Run Summary\n\nResult: Defeat 💀\nSurvived: ${stats.day}/30 Days\nPeak Users: ${formatCompactNumber(stats.users)}\nFailure Cause: ${cause.title}\nGrade: ${finalGrade}\n\nScale your SaaS at Battle of Scaling!`;
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-[#09090b]">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md space-y-6"
-      >
-        <div className="text-center space-y-2">
-          <motion.h1
-            className="text-4xl font-bold text-[#ef4444]"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            {defeat.title}
-          </motion.h1>
-          <motion.p
-            className="text-sm text-[#a1a1aa]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            {defeat.message}
-          </motion.p>
+    <div className="h-screen w-screen flex flex-col items-center justify-center p-6 bg-[#0b0b0f] font-mono text-[#f3f4f6] select-none overflow-hidden">
+      <div className="w-full max-w-md bg-[#121217] border border-[#1f1f29] rounded p-5 space-y-4 shadow-2xl">
+        
+        {/* Header */}
+        <div className="text-center space-y-1">
+          <div className="text-[9px] text-[#f43f5e] font-bold uppercase tracking-widest flex items-center justify-center gap-1">
+            <AlertOctagon className="size-3 text-[#f43f5e]" />
+            Run Failed
+          </div>
+          <h1 className="text-xl font-bold text-white uppercase tracking-wider">
+            Game Over: Startup Failed
+          </h1>
+          <p className="text-[10px] text-slate-400">
+            {cause.desc}
+          </p>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Card className="bg-[#18181b] border-[#27272a]">
-            <CardContent className="p-4 space-y-3">
-              <div className="text-[10px] text-[#52525b] uppercase font-bold tracking-wider">
-                Run Summary
-              </div>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <span className="text-[#a1a1aa]">Result</span>
-                  <div className="font-bold text-[#ef4444]">Failed</div>
-                </div>
-                <div>
-                  <span className="text-[#a1a1aa]">Reason</span>
-                  <div className="font-bold text-[#fafafa]">{defeat.reason}</div>
-                </div>
-                <div>
-                  <span className="text-[#a1a1aa]">Survived</span>
-                  <div className="font-bold text-[#fafafa]">{stats.day} / 30 days</div>
-                </div>
-                <div>
-                  <span className="text-[#a1a1aa]">Peak Users</span>
-                  <div className="font-bold text-[#3b82f6]">{formatNumber(stats.users)}</div>
-                </div>
-                <div>
-                  <span className="text-[#a1a1aa]">Final MRR</span>
-                  <div className="font-bold text-[#22c55e]">{formatMoney(stats.mrr)}</div>
-                </div>
-                <div>
-                  <span className="text-[#a1a1aa]">Final Cash</span>
-                  <div className="font-bold text-[#ef4444]">{formatMoney(stats.money)}</div>
-                </div>
-                <div>
-                  <span className="text-[#a1a1aa]">Performance</span>
-                  <div className="font-bold text-[#f59e0b]">{stats.performance}%</div>
-                </div>
-                <div>
-                  <span className="text-[#a1a1aa]">Reputation</span>
-                  <div className="font-bold text-[#8b5cf6]">{stats.reputation}%</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+        {/* Grade Widget */}
+        <div className="flex items-center justify-between p-3 bg-[#0b0b0f] border border-[#1f1f29] rounded">
+          <div className="space-y-0.5">
+            <span className="text-slate-500 uppercase text-[8px] font-bold block tracking-wider">
+              Performance Rating
+            </span>
+            <span className="text-[11px] text-slate-300">Scale performance score</span>
+          </div>
+          <div className="size-12 rounded bg-[#f43f5e]/10 border border-[#f43f5e]/30 flex items-center justify-center text-xl font-bold text-[#f43f5e]">
+            {finalGrade}
+          </div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="text-center"
-        >
-          <Button
-            size="lg"
-            className="bg-[#ef4444] hover:bg-[#dc2626] text-white font-bold"
+        {/* Run Details Grid */}
+        <div className="bg-[#0b0b0f] border border-[#1f1f29] p-3 rounded space-y-2 text-[10px]">
+          <span className="text-slate-500 uppercase text-[8px] font-bold block border-b border-[#1f1f29]/50 pb-1">
+            Core Diagnostics Summary
+          </span>
+          <div className="grid grid-cols-2 gap-2.5 text-slate-300">
+            <div className="flex justify-between">
+              <span>Survived:</span>
+              <span className="text-white font-bold">{stats.day} / 30 days</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Main Cause:</span>
+              <span className="text-[#f43f5e] font-bold truncate max-w-[110px]">{cause.title}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Peak Users:</span>
+              <span className="text-white font-bold">{formatCompactNumber(stats.users)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Final MRR:</span>
+              <span className="text-white font-bold">{formatCurrency(stats.mrr)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Final Cash:</span>
+              <span className="text-white font-bold">{formatCurrency(stats.money)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Stability:</span>
+              <span className="text-white font-bold">{stats.performance}%</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Strategy Evaluation */}
+        <div className="p-2.5 border border-[#f43f5e]/25 bg-[#f43f5e]/5 text-[9px] text-[#f43f5e] rounded leading-normal">
+          <strong>Post-Mortem:</strong> {cause.main} Accumulate tech debt cautiously and scale platform capacity headroom early during traffic spikes.
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-2 pt-1.5">
+          <button
             onClick={() => {
               playClick();
               restart();
             }}
+            className="flex-1 py-2 bg-[#f43f5e] hover:bg-[#f43f5e]/90 text-white font-bold uppercase rounded cursor-pointer text-[10px] text-center"
           >
             Try Again
-          </Button>
-        </motion.div>
-      </motion.div>
+          </button>
+          
+          <button
+            onClick={handleShare}
+            className="px-4 py-2 border border-[#1f1f29] hover:bg-[#1a1a24] text-slate-300 hover:text-white font-bold uppercase rounded cursor-pointer text-[10px] flex items-center justify-center gap-1.5"
+          >
+            <Share2 className="size-3.5" />
+            {copied ? "Copied!" : "Share Summary"}
+          </button>
+        </div>
+
+      </div>
     </div>
   );
 }

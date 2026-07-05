@@ -54,6 +54,8 @@ export interface GameState {
   runwayDays: number | "profitable";
   conversionRate: number;
   arpu: number;
+  cac: number;
+  acquisitionReadiness: number;
   dailyExpensesBreakdown: DailyExpensesBreakdown;
   dailyRevenueBreakdown: DailyRevenueBreakdown;
   performance: number;
@@ -105,6 +107,8 @@ export const INITIAL_STATE: Omit<
   runwayDays: 208,
   conversionRate: 0.02,
   arpu: 29,
+  cac: 0,
+  acquisitionReadiness: 1.0,
   dailyExpensesBreakdown: defaultExpensesBreakdown,
   dailyRevenueBreakdown: defaultRevenueBreakdown,
   performance: 80,

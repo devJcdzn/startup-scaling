@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;650;700&family=JetBrains+Mono:ital,wght@0,300..800;1,300..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;650;700&family=JetBrains+Mono:ital,wght@0,300..800;1,300..800&display=swap');
 
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -9,9 +9,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-mono);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
-  --font-heading: var(--font-mono);
+  --font-heading: var(--font-sans);
   --color-primary-foreground: #121214;
   --color-primary: var(--terminal-accent);
   --color-border: var(--terminal-border);
@@ -25,6 +25,7 @@
   --background: #0b0b0f;
   --foreground: var(--terminal-text);
   
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   /* Modern Executive SaaS Accent (Emerald Green + Charcoal) */
@@ -70,7 +71,7 @@
   }
   
   html, body, button, input, select, textarea {
-    font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+    font-family: var(--font-sans) !important;
     background-color: #0b0b0f;
     color: var(--terminal-text);
   }

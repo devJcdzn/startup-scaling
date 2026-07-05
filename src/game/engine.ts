@@ -8,6 +8,8 @@ import { checkWin, checkLoss, checkDeadlineLoss } from "./conditions";
 import { calculateEconomy } from "./economy";
 import { applyActiveModifiers } from "./modifiers/apply-modifiers";
 import { expireModifiers } from "./modifiers/expire-modifiers";
+import { applyGrowthPressure } from "./growth/pressure";
+import { calculateAcquisitionReadiness } from "./growth/readiness";
 import eventsData from "./data/events.json";
 
 let rng = mulberry32(42);
@@ -68,7 +70,9 @@ function applyDailyEffects(state: GameState): GameState {
 function applyGrowth(state: GameState): GameState {
   const multiplier = calculateGrowthMultiplier(state.reputation, state.hype);
   const newUsers = calculateNewUsers(state.users, state.hype, rng, multiplier);
-  return { ...state, users: state.users + newUsers };
+  let next = { ...state, users: state.users + newUsers };
+  next = applyGrowthPressure(next, newUsers);
+  return next;
 }
 
 function applyEconomy(state: GameState): GameState {
@@ -118,6 +122,7 @@ export function tick(state: GameState, now: number): GameState {
   next = applyDailyEffects(next);
   next = applyEconomy(next);
   next.difficulty = calculateDifficulty(next.users);
+  next.acquisitionReadiness = calculateAcquisitionReadiness(next);
 
   next.activeModifiers = expireModifiers(next.activeModifiers, next.day);
 

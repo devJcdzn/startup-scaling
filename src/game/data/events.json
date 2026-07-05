@@ -11,9 +11,71 @@
       "effects": { "performance": -3, "reputation": -2, "techDebt": 2 }
     },
     "choices": [
-      { "text": "Scale up servers", "effects": { "money": -300, "performance": 25 } },
-      { "text": "Add caching layer", "effects": { "money": -150, "performance": 15, "techDebt": 5 } },
-      { "text": "Ignore it", "effects": { "performance": -30, "reputation": -20 } }
+      {
+        "text": "Scale up servers",
+        "description": "Add more server capacity to handle the traffic spike.",
+        "effects": { "money": -300, "performance": 25 },
+        "impact": {
+          "immediate": [
+            { "stat": "money", "value": -300, "label": "-$300 Cash" },
+            { "stat": "performance", "value": 25, "label": "+25 Stability" }
+          ],
+          "recurring": [
+            { "stat": "dailyExpenses", "value": 50, "interval": "day", "label": "+$50/day Infra" }
+          ],
+          "risks": [
+            { "risk": "infraOverload", "value": -0.4, "label": "-40% Overload Risk" }
+          ]
+        }
+      },
+      {
+        "text": "Add caching layer",
+        "description": "Cache expensive queries to reduce database pressure.",
+        "effects": { "money": -150, "performance": 15, "techDebt": 5 },
+        "impact": {
+          "immediate": [
+            { "stat": "money", "value": -150, "label": "-$150 Cash" },
+            { "stat": "performance", "value": 15, "label": "+15 Stability" },
+            { "stat": "techDebt", "value": 5, "label": "+5 Tech Debt" }
+          ],
+          "recurring": [
+            { "stat": "dailyExpenses", "value": -20, "interval": "day", "label": "-$20/day Infra" }
+          ],
+          "risks": [
+            { "risk": "databaseIncident", "value": -0.2, "label": "-20% DB Risk" }
+          ]
+        }
+      },
+      {
+        "text": "Ignore it",
+        "description": "Preserve cash and hope the traffic subsides.",
+        "effects": { "performance": -30, "reputation": -20 },
+        "impact": {
+          "immediate": [
+            { "stat": "performance", "value": -30, "label": "-30 Stability" },
+            { "stat": "reputation", "value": -20, "label": "-20 Reputation" }
+          ],
+          "risks": [
+            { "risk": "infraOverload", "value": 0.3, "label": "+30% Overload Risk" }
+          ],
+          "modifiers": [
+            {
+              "id": "overloaded-servers",
+              "label": "Overloaded Servers",
+              "description": "Server instability continues without intervention.",
+              "source": "Server Overloaded",
+              "type": "debuff",
+              "category": "infrastructure",
+              "durationDays": 3,
+              "startedAtDay": 0,
+              "effects": [
+                { "stat": "performance", "value": -2, "mode": "flat", "interval": "day", "label": "-2 Stability/day" },
+                { "stat": "reputation", "value": -1, "mode": "flat", "interval": "day", "label": "-1 Reputation/day" }
+              ]
+            }
+          ]
+        }
+      }
     ]
   },
   {
@@ -28,9 +90,67 @@
       "effects": { "performance": -2, "reputation": -1, "techDebt": 1 }
     },
     "choices": [
-      { "text": "Optimize queries", "effects": { "performance": 20, "techDebt": -5 } },
-      { "text": "Add read replicas", "effects": { "money": -250, "performance": 25 } },
-      { "text": "Ignore it", "effects": { "performance": -25, "reputation": -15 } }
+      {
+        "text": "Optimize queries",
+        "description": "Rewrite slow queries and add proper indexes.",
+        "effects": { "performance": 20, "techDebt": -5 },
+        "impact": {
+          "immediate": [
+            { "stat": "performance", "value": 20, "label": "+20 Stability" },
+            { "stat": "techDebt", "value": -5, "label": "-5 Tech Debt" }
+          ],
+          "risks": [
+            { "risk": "databaseIncident", "value": -0.25, "label": "-25% DB Risk" }
+          ]
+        }
+      },
+      {
+        "text": "Add read replicas",
+        "description": "Distribute read load across multiple database instances.",
+        "effects": { "money": -250, "performance": 25 },
+        "impact": {
+          "immediate": [
+            { "stat": "money", "value": -250, "label": "-$250 Cash" },
+            { "stat": "performance", "value": 25, "label": "+25 Stability" }
+          ],
+          "recurring": [
+            { "stat": "dailyExpenses", "value": 40, "interval": "day", "label": "+$40/day Infra" }
+          ],
+          "risks": [
+            { "risk": "databaseIncident", "value": -0.35, "label": "-35% DB Risk" }
+          ]
+        }
+      },
+      {
+        "text": "Ignore it",
+        "description": "Users will have to wait. Maybe it resolves itself.",
+        "effects": { "performance": -25, "reputation": -15 },
+        "impact": {
+          "immediate": [
+            { "stat": "performance", "value": -25, "label": "-25 Stability" },
+            { "stat": "reputation", "value": -15, "label": "-15 Reputation" }
+          ],
+          "risks": [
+            { "risk": "databaseIncident", "value": 0.25, "label": "+25% DB Risk" }
+          ],
+          "modifiers": [
+            {
+              "id": "slow-database-persist",
+              "label": "Slow Database",
+              "description": "Database performance degrades without optimization.",
+              "source": "Slow Database",
+              "type": "debuff",
+              "category": "infrastructure",
+              "durationDays": 4,
+              "startedAtDay": 0,
+              "effects": [
+                { "stat": "performance", "value": -1, "mode": "flat", "interval": "day", "label": "-1 Stability/day" },
+                { "stat": "reputation", "value": -1, "mode": "flat", "interval": "day", "label": "-1 Reputation/day" }
+              ]
+            }
+          ]
+        }
+      }
     ]
   },
   {
@@ -45,16 +165,71 @@
       "effects": { "performance": -4, "reputation": -3, "techDebt": 2 }
     },
     "choices": [
-      { "text": "Upgrade storage", "effects": { "money": -400, "performance": 15 } },
-      { "text": "Clean up old data", "effects": { "performance": 10, "techDebt": 10 } },
-      { "text": "Ignore it", "effects": { "performance": -35, "reputation": -25 } }
+      {
+        "text": "Upgrade storage",
+        "description": "Immediately expand disk capacity to restore operations.",
+        "effects": { "money": -400, "performance": 15 },
+        "impact": {
+          "immediate": [
+            { "stat": "money", "value": -400, "label": "-$400 Cash" },
+            { "stat": "performance", "value": 15, "label": "+15 Stability" }
+          ],
+          "recurring": [
+            { "stat": "dailyExpenses", "value": 30, "interval": "day", "label": "+$30/day Infra" }
+          ]
+        }
+      },
+      {
+        "text": "Clean up old data",
+        "description": "Delete logs and unused data to free space quickly.",
+        "effects": { "performance": 10, "techDebt": 10 },
+        "impact": {
+          "immediate": [
+            { "stat": "performance", "value": 10, "label": "+10 Stability" },
+            { "stat": "techDebt", "value": 10, "label": "+10 Tech Debt" }
+          ],
+          "risks": [
+            { "risk": "databaseIncident", "value": 0.15, "label": "+15% DB Risk (data loss)" }
+          ]
+        }
+      },
+      {
+        "text": "Ignore it",
+        "description": "Hope the disk fills up slowly enough to handle later.",
+        "effects": { "performance": -35, "reputation": -25 },
+        "impact": {
+          "immediate": [
+            { "stat": "performance", "value": -35, "label": "-35 Stability" },
+            { "stat": "reputation", "value": -25, "label": "-25 Reputation" }
+          ],
+          "risks": [
+            { "risk": "infraOverload", "value": 0.4, "label": "+40% System Failure Risk" }
+          ],
+          "modifiers": [
+            {
+              "id": "disk-space-critical",
+              "label": "Disk Space Critical",
+              "description": "System instability due to full disk.",
+              "source": "Disk Space Critical",
+              "type": "debuff",
+              "category": "infrastructure",
+              "durationDays": 2,
+              "startedAtDay": 0,
+              "effects": [
+                { "stat": "performance", "value": -3, "mode": "flat", "interval": "day", "label": "-3 Stability/day" },
+                { "stat": "reputation", "value": -2, "mode": "flat", "interval": "day", "label": "-2 Reputation/day" }
+              ]
+            }
+          ]
+        }
+      }
     ]
   },
   {
     "id": "cache_needed",
     "category": "infrastructure",
     "title": "Caching Opportunity",
-    "description": "Your app is making redundant database calls. A caching layer could dramatically improve performance.",
+    "description": "Your database is handling repeated queries from thousands of users. This is increasing infrastructure pressure.",
     "difficultyThreshold": 0.9,
     "severity": "low",
     "delayPenalty": {
@@ -62,9 +237,97 @@
       "effects": { "performance": -1, "techDebt": 1 }
     },
     "choices": [
-      { "text": "Implement Redis cache", "effects": { "money": -200, "performance": 25, "techDebt": 5 } },
-      { "text": "Add in-memory cache", "effects": { "performance": 15, "techDebt": 10 } },
-      { "text": "Skip for now", "effects": { "performance": -10 } }
+      {
+        "text": "Implement Redis cache",
+        "description": "Deploy a scalable cache layer for repeated database queries.",
+        "effects": { "money": -200, "performance": 25, "techDebt": 5 },
+        "impact": {
+          "immediate": [
+            { "stat": "money", "value": -200, "label": "-$200 Cash" },
+            { "stat": "performance", "value": 25, "label": "+25 Stability" },
+            { "stat": "techDebt", "value": 5, "label": "+5 Tech Debt" }
+          ],
+          "recurring": [
+            { "stat": "dailyExpenses", "value": -30, "interval": "day", "label": "-$30/day Infra" }
+          ],
+          "risks": [
+            { "risk": "databaseIncident", "value": -0.35, "label": "-35% DB Risk" }
+          ],
+          "modifiers": [
+            {
+              "id": "redis-cache-layer",
+              "label": "Redis Cache Layer",
+              "description": "Reduces repeated database pressure at scale.",
+              "source": "Caching Opportunity",
+              "type": "buff",
+              "category": "infrastructure",
+              "effects": [
+                { "stat": "dailyExpenses", "value": -30, "mode": "flat", "interval": "day", "label": "-$30/day infra" },
+                { "value": -0.35, "mode": "risk", "label": "-35% DB risk" }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "text": "Add in-memory cache",
+        "description": "Quick app-layer caching. Cheap, but fragile.",
+        "effects": { "performance": 15, "techDebt": 10 },
+        "impact": {
+          "immediate": [
+            { "stat": "performance", "value": 15, "label": "+15 Stability" },
+            { "stat": "techDebt", "value": 10, "label": "+10 Tech Debt" }
+          ],
+          "risks": [
+            { "risk": "databaseIncident", "value": -0.15, "label": "-15% DB Risk (temporary)" }
+          ],
+          "modifiers": [
+            {
+              "id": "temporary-cache-patch",
+              "label": "Temporary Cache Patch",
+              "description": "Quick app-layer caching. Fragile and temporary.",
+              "source": "Caching Opportunity",
+              "type": "mixed",
+              "category": "infrastructure",
+              "durationDays": 5,
+              "startedAtDay": 0,
+              "effects": [
+                { "stat": "performance", "value": 2, "mode": "flat", "interval": "day", "label": "+2 Stability/day" },
+                { "stat": "techDebt", "value": 1, "mode": "flat", "interval": "day", "label": "+1 Tech Debt/day" }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "text": "Skip for now",
+        "description": "Preserve cash and avoid technical changes.",
+        "effects": { "performance": -10 },
+        "impact": {
+          "immediate": [
+            { "stat": "performance", "value": -10, "label": "-10 Stability" }
+          ],
+          "risks": [
+            { "risk": "databaseIncident", "value": 0.2, "label": "+20% DB Risk" }
+          ],
+          "modifiers": [
+            {
+              "id": "ignored-cache-pressure",
+              "label": "Ignored Cache Pressure",
+              "description": "Database pressure continues to grow without mitigation.",
+              "source": "Caching Opportunity",
+              "type": "debuff",
+              "category": "infrastructure",
+              "durationDays": 3,
+              "startedAtDay": 0,
+              "effects": [
+                { "stat": "performance", "value": -2, "mode": "flat", "interval": "day", "label": "-2 Stability/day" },
+                { "stat": "reputation", "value": -1, "mode": "flat", "interval": "day", "label": "-1 Reputation/day" }
+              ]
+            }
+          ]
+        }
+      }
     ]
   },
   {
@@ -79,9 +342,58 @@
       "effects": { "reputation": -2, "performance": -1 }
     },
     "choices": [
-      { "text": "Set up CDN", "effects": { "money": -300, "performance": 30, "reputation": 15 } },
-      { "text": "Optimize assets only", "effects": { "performance": 15, "techDebt": 5 } },
-      { "text": "Ignore it", "effects": { "reputation": -20 } }
+      {
+        "text": "Set up CDN",
+        "description": "Deploy global content delivery to reduce latency worldwide.",
+        "effects": { "money": -300, "performance": 30, "reputation": 15 },
+        "impact": {
+          "immediate": [
+            { "stat": "money", "value": -300, "label": "-$300 Cash" },
+            { "stat": "performance", "value": 30, "label": "+30 Stability" },
+            { "stat": "reputation", "value": 15, "label": "+15 Reputation" }
+          ],
+          "recurring": [
+            { "stat": "dailyExpenses", "value": 25, "interval": "day", "label": "+$25/day Infra" }
+          ]
+        }
+      },
+      {
+        "text": "Optimize assets only",
+        "description": "Compress and optimize existing assets without new infrastructure.",
+        "effects": { "performance": 15, "techDebt": 5 },
+        "impact": {
+          "immediate": [
+            { "stat": "performance", "value": 15, "label": "+15 Stability" },
+            { "stat": "techDebt", "value": 5, "label": "+5 Tech Debt" }
+          ]
+        }
+      },
+      {
+        "text": "Ignore it",
+        "description": "International users will have to deal with latency.",
+        "effects": { "reputation": -20 },
+        "impact": {
+          "immediate": [
+            { "stat": "reputation", "value": -20, "label": "-20 Reputation" }
+          ],
+          "modifiers": [
+            {
+              "id": "global-latency-issues",
+              "label": "Global Latency Issues",
+              "description": "International users experience poor performance.",
+              "source": "Global Distribution",
+              "type": "debuff",
+              "category": "infrastructure",
+              "durationDays": 4,
+              "startedAtDay": 0,
+              "effects": [
+                { "stat": "reputation", "value": -1, "mode": "flat", "interval": "day", "label": "-1 Reputation/day" },
+                { "stat": "performance", "value": -1, "mode": "flat", "interval": "day", "label": "-1 Stability/day" }
+              ]
+            }
+          ]
+        }
+      }
     ]
   },
   {
@@ -96,16 +408,50 @@
       "effects": { "hype": -3, "users": -50 }
     },
     "choices": [
-      { "text": "Capitalize on hype", "effects": { "hype": 25, "users": 500, "money": -100 } },
-      { "text": "Focus on retention", "effects": { "hype": 15, "users": 300, "performance": -5 } },
-      { "text": "Let it pass", "effects": { "hype": 10 } }
+      {
+        "text": "Capitalize on hype",
+        "description": "Launch a landing page and capture the incoming traffic.",
+        "effects": { "hype": 20, "users": 200, "money": -150 },
+        "impact": {
+          "immediate": [
+            { "stat": "hype", "value": 20, "label": "+20 Hype" },
+            { "stat": "users", "value": 200, "label": "+200 Users" },
+            { "stat": "money", "value": -150, "label": "-$150 Cash" }
+          ],
+          "risks": [
+            { "risk": "infraOverload", "value": 0.15, "label": "+15% Infra Risk" }
+          ]
+        }
+      },
+      {
+        "text": "Focus on retention",
+        "description": "Engage with new visitors and convert them to active users.",
+        "effects": { "hype": 15, "users": 100, "performance": -5 },
+        "impact": {
+          "immediate": [
+            { "stat": "hype", "value": 15, "label": "+15 Hype" },
+            { "stat": "users", "value": 100, "label": "+100 Users" },
+            { "stat": "performance", "value": -5, "label": "-5 Stability" }
+          ]
+        }
+      },
+      {
+        "text": "Let it pass",
+        "description": "Don't chase viral moments. Focus on the product.",
+        "effects": { "hype": 10 },
+        "impact": {
+          "immediate": [
+            { "stat": "hype", "value": 10, "label": "+10 Hype" }
+          ]
+        }
+      }
     ]
   },
   {
     "id": "product_hunt",
     "category": "growth",
-    "title": "Featured on Product Hunt",
-    "description": "Your product has been featured on Product Hunt! Expect a surge of early adopters.",
+    "title": "Product Hunt Launch Window",
+    "description": "Your product can launch today, but the result depends on preparation and product quality.",
     "difficultyThreshold": 1.0,
     "severity": "high",
     "delayPenalty": {
@@ -113,16 +459,54 @@
       "effects": { "hype": -3, "users": -100 }
     },
     "choices": [
-      { "text": "Engage with community", "effects": { "hype": 20, "reputation": 15, "users": 800 } },
-      { "text": "Push new features", "effects": { "hype": 15, "users": 400, "techDebt": 10 } },
-      { "text": "Focus on infrastructure", "effects": { "performance": 15, "hype": 10 } }
+      {
+        "text": "Prepare Launch",
+        "description": "Invest in a polished launch with demo, screenshots, and community prep.",
+        "effects": { "hype": 15, "users": 300, "money": -200, "reputation": 10 },
+        "impact": {
+          "immediate": [
+            { "stat": "hype", "value": 15, "label": "+15 Hype" },
+            { "stat": "users", "value": 300, "label": "+300 Users" },
+            { "stat": "money", "value": -200, "label": "-$200 Cash" },
+            { "stat": "reputation", "value": 10, "label": "+10 Reputation" }
+          ],
+          "risks": [
+            { "risk": "infraOverload", "value": 0.1, "label": "+10% Infra Risk" }
+          ]
+        }
+      },
+      {
+        "text": "Launch Unprepared",
+        "description": "Ship what you have and hope for the best.",
+        "effects": { "hype": 10, "users": 150, "techDebt": 5 },
+        "impact": {
+          "immediate": [
+            { "stat": "hype", "value": 10, "label": "+10 Hype" },
+            { "stat": "users", "value": 150, "label": "+150 Users" },
+            { "stat": "techDebt", "value": 5, "label": "+5 Tech Debt" }
+          ],
+          "risks": [
+            { "risk": "infraOverload", "value": 0.25, "label": "+25% Infra Risk" }
+          ]
+        }
+      },
+      {
+        "text": "Skip Launch",
+        "description": "Wait for a better time to launch.",
+        "effects": { "hype": -5 },
+        "impact": {
+          "immediate": [
+            { "stat": "hype", "value": -5, "label": "-5 Hype" }
+          ]
+        }
+      }
     ]
   },
   {
     "id": "hacker_news",
     "category": "growth",
-    "title": "Hit the Front Page of HN",
-    "description": "Your project made it to the front page of Hacker News. Developers are flocking in.",
+    "title": "Hacker News Spike",
+    "description": "Your post is gaining traction. Traffic is coming whether you are ready or not.",
     "difficultyThreshold": 1.3,
     "severity": "critical",
     "delayPenalty": {
@@ -130,16 +514,60 @@
       "effects": { "hype": -5, "users": -150, "reputation": -2 }
     },
     "choices": [
-      { "text": "Open source a feature", "effects": { "hype": 25, "reputation": 20, "users": 1200 } },
-      { "text": "Fix reported issues", "effects": { "performance": 15, "reputation": 15, "users": 600 } },
-      { "text": "Ride the wave", "effects": { "hype": 15, "users": 900 } }
+      {
+        "text": "Scale Before Peak",
+        "description": "Quickly upgrade infrastructure to handle the incoming traffic.",
+        "effects": { "hype": 15, "users": 250, "money": -300, "performance": 10 },
+        "impact": {
+          "immediate": [
+            { "stat": "hype", "value": 15, "label": "+15 Hype" },
+            { "stat": "users", "value": 250, "label": "+250 Users" },
+            { "stat": "money", "value": -300, "label": "-$300 Cash" },
+            { "stat": "performance", "value": 10, "label": "+10 Stability" }
+          ],
+          "recurring": [
+            { "stat": "dailyExpenses", "value": 30, "interval": "day", "label": "+$30/day Infra" }
+          ],
+          "risks": [
+            { "risk": "infraOverload", "value": -0.2, "label": "-20% Infra Risk" }
+          ]
+        }
+      },
+      {
+        "text": "Let It Ride",
+        "description": "Don't spend money. Hope the traffic converts naturally.",
+        "effects": { "hype": 15, "users": 150 },
+        "impact": {
+          "immediate": [
+            { "stat": "hype", "value": 15, "label": "+15 Hype" },
+            { "stat": "users", "value": 150, "label": "+150 Users" }
+          ],
+          "risks": [
+            { "risk": "infraOverload", "value": 0.3, "label": "+30% Infra Risk" }
+          ]
+        }
+      },
+      {
+        "text": "Disable Heavy Features",
+        "description": "Reduce load by disabling non-essential features during the spike.",
+        "effects": { "hype": 10, "users": 100, "conversionRate": -0.005 },
+        "impact": {
+          "immediate": [
+            { "stat": "hype", "value": 10, "label": "+10 Hype" },
+            { "stat": "users", "value": 100, "label": "+100 Users" }
+          ],
+          "risks": [
+            { "risk": "infraOverload", "value": -0.15, "label": "-15% Infra Risk" }
+          ]
+        }
+      }
     ]
   },
   {
     "id": "influencer_recommend",
     "category": "growth",
-    "title": "Influencer Recommendation",
-    "description": "A tech influencer with 100k followers just recommended your product in a video.",
+    "title": "Influencer Offer",
+    "description": "A creator wants to promote your SaaS to a large audience.",
     "difficultyThreshold": 1.6,
     "severity": "high",
     "delayPenalty": {
@@ -147,16 +575,48 @@
       "effects": { "hype": -3, "users": -80 }
     },
     "choices": [
-      { "text": "Offer affiliate program", "effects": { "money": -200, "hype": 30, "users": 2000 } },
-      { "text": "Capitalize with content", "effects": { "hype": 20, "reputation": 10, "users": 1000 } },
-      { "text": "Let it pass", "effects": { "hype": 15, "users": 500 } }
+      {
+        "text": "Fixed Sponsorship",
+        "description": "Pay upfront for guaranteed reach and placement.",
+        "effects": { "money": -400, "hype": 20, "users": 300, "reputation": 5 },
+        "impact": {
+          "immediate": [
+            { "stat": "money", "value": -400, "label": "-$400 Cash" },
+            { "stat": "hype", "value": 20, "label": "+20 Hype" },
+            { "stat": "users", "value": 300, "label": "+300 Users" },
+            { "stat": "reputation", "value": 5, "label": "+5 Reputation" }
+          ]
+        }
+      },
+      {
+        "text": "Performance Deal",
+        "description": "Pay based on results. Lower upfront cost, lower guaranteed reach.",
+        "effects": { "money": -100, "hype": 10, "users": 150 },
+        "impact": {
+          "immediate": [
+            { "stat": "money", "value": -100, "label": "-$100 Cash" },
+            { "stat": "hype", "value": 10, "label": "+10 Hype" },
+            { "stat": "users", "value": 150, "label": "+150 Users" }
+          ]
+        }
+      },
+      {
+        "text": "Decline",
+        "description": "Pass on the opportunity.",
+        "effects": { "hype": 5 },
+        "impact": {
+          "immediate": [
+            { "stat": "hype", "value": 5, "label": "+5 Hype" }
+          ]
+        }
+      }
     ]
   },
   {
     "id": "reddit_popular",
     "category": "growth",
-    "title": "Trending on Reddit",
-    "description": "Your product is gaining traction on r/programming and r/SaaS. Developers are discussing it.",
+    "title": "Community Buzz",
+    "description": "Developers are talking about your product on Reddit and forums.",
     "difficultyThreshold": 1.3,
     "severity": "medium",
     "delayPenalty": {
@@ -164,9 +624,40 @@
       "effects": { "hype": -2, "users": -60 }
     },
     "choices": [
-      { "text": "Engage with comments", "effects": { "hype": 20, "reputation": 15, "users": 700 } },
-      { "text": "Post detailed case study", "effects": { "hype": 15, "reputation": 20, "users": 400 } },
-      { "text": "Ignore it", "effects": { "hype": 10 } }
+      {
+        "text": "Engage Community",
+        "description": "Join the discussion and answer questions directly.",
+        "effects": { "hype": 15, "reputation": 10, "users": 150 },
+        "impact": {
+          "immediate": [
+            { "stat": "hype", "value": 15, "label": "+15 Hype" },
+            { "stat": "reputation", "value": 10, "label": "+10 Reputation" },
+            { "stat": "users", "value": 150, "label": "+150 Users" }
+          ]
+        }
+      },
+      {
+        "text": "Post Case Study",
+        "description": "Share a technical deep-dive to build credibility.",
+        "effects": { "hype": 10, "reputation": 15, "users": 100 },
+        "impact": {
+          "immediate": [
+            { "stat": "hype", "value": 10, "label": "+10 Hype" },
+            { "stat": "reputation", "value": 15, "label": "+15 Reputation" },
+            { "stat": "users", "value": 100, "label": "+100 Users" }
+          ]
+        }
+      },
+      {
+        "text": "Ignore",
+        "description": "Let the buzz fade naturally.",
+        "effects": { "hype": 5 },
+        "impact": {
+          "immediate": [
+            { "stat": "hype", "value": 5, "label": "+5 Hype" }
+          ]
+        }
+      }
     ]
   },
   {
@@ -178,12 +669,45 @@
     "severity": "low",
     "delayPenalty": {
       "intervalMs": 5000,
-      "effects": { "reputation": -2, "hype": -1, "techDebt": 1 }
+      "effects": { "reputation": -2, "hype": -1 }
     },
     "choices": [
-      { "text": "Build dark mode", "effects": { "reputation": 20, "hype": 15, "techDebt": 5 } },
-      { "text": "Add to roadmap", "effects": { "reputation": -10 } },
-      { "text": "Ship it fast (hacky)", "effects": { "reputation": 5, "techDebt": 15 } }
+      {
+        "text": "Build dark mode",
+        "description": "Implement a proper dark mode with system preference detection.",
+        "effects": { "reputation": 20, "hype": 15, "techDebt": 5 },
+        "impact": {
+          "immediate": [
+            { "stat": "reputation", "value": 20, "label": "+20 Reputation" },
+            { "stat": "hype", "value": 15, "label": "+15 Hype" },
+            { "stat": "techDebt", "value": 5, "label": "+5 Tech Debt" }
+          ]
+        }
+      },
+      {
+        "text": "Add to roadmap",
+        "description": "Acknowledge the request but prioritize other work.",
+        "effects": { "reputation": -10 },
+        "impact": {
+          "immediate": [
+            { "stat": "reputation", "value": -10, "label": "-10 Reputation" }
+          ]
+        }
+      },
+      {
+        "text": "Ship it fast (hacky)",
+        "description": "Quick CSS toggle without proper testing.",
+        "effects": { "reputation": 5, "techDebt": 15 },
+        "impact": {
+          "immediate": [
+            { "stat": "reputation", "value": 5, "label": "+5 Reputation" },
+            { "stat": "techDebt", "value": 15, "label": "+15 Tech Debt" }
+          ],
+          "risks": [
+            { "risk": "bugSpike", "value": 0.2, "label": "+20% Bug Risk" }
+          ]
+        }
+      }
     ]
   },
   {
@@ -195,12 +719,57 @@
     "severity": "medium",
     "delayPenalty": {
       "intervalMs": 4000,
-      "effects": { "reputation": -2, "hype": -1, "techDebt": 1 }
+      "effects": { "reputation": -2, "hype": -1 }
     },
     "choices": [
-      { "text": "Build it properly", "effects": { "reputation": 25, "money": -200, "techDebt": -10 } },
-      { "text": "MVP version", "effects": { "reputation": 15, "techDebt": 10 } },
-      { "text": "Skip it", "effects": { "reputation": -25 } }
+      {
+        "text": "Build it properly",
+        "description": "Invest time in a well-tested, polished implementation.",
+        "effects": { "reputation": 25, "money": -200, "techDebt": -10 },
+        "impact": {
+          "immediate": [
+            { "stat": "reputation", "value": 25, "label": "+25 Reputation" },
+            { "stat": "money", "value": -200, "label": "-$200 Cash" },
+            { "stat": "techDebt", "value": -10, "label": "-10 Tech Debt" }
+          ]
+        }
+      },
+      {
+        "text": "MVP version",
+        "description": "Ship a basic version quickly to show progress.",
+        "effects": { "reputation": 15, "techDebt": 10 },
+        "impact": {
+          "immediate": [
+            { "stat": "reputation", "value": 15, "label": "+15 Reputation" },
+            { "stat": "techDebt", "value": 10, "label": "+10 Tech Debt" }
+          ]
+        }
+      },
+      {
+        "text": "Skip it",
+        "description": "Focus on other priorities.",
+        "effects": { "reputation": -25 },
+        "impact": {
+          "immediate": [
+            { "stat": "reputation", "value": -25, "label": "-25 Reputation" }
+          ],
+          "modifiers": [
+            {
+              "id": "ignored-feature-request",
+              "label": "Ignored Feature Request",
+              "description": "Users are frustrated by lack of requested features.",
+              "source": "Most Requested Feature",
+              "type": "debuff",
+              "category": "product",
+              "durationDays": 4,
+              "startedAtDay": 0,
+              "effects": [
+                { "stat": "reputation", "value": -1, "mode": "flat", "interval": "day", "label": "-1 Reputation/day" }
+              ]
+            }
+          ]
+        }
+      }
     ]
   },
   {
@@ -212,12 +781,59 @@
     "severity": "high",
     "delayPenalty": {
       "intervalMs": 3000,
-      "effects": { "reputation": -3, "hype": -2, "techDebt": 1 }
+      "effects": { "reputation": -3, "hype": -2 }
     },
     "choices": [
-      { "text": "Fix all bugs", "effects": { "reputation": 25, "performance": 20, "money": -150 } },
-      { "text": "Offer free month", "effects": { "reputation": 15, "money": -300 } },
-      { "text": "Ignore reviews", "effects": { "reputation": -30, "users": -200 } }
+      {
+        "text": "Fix all bugs",
+        "description": "Dedicate a sprint to squash every reported bug.",
+        "effects": { "reputation": 25, "performance": 20, "money": -150 },
+        "impact": {
+          "immediate": [
+            { "stat": "reputation", "value": 25, "label": "+25 Reputation" },
+            { "stat": "performance", "value": 20, "label": "+20 Stability" },
+            { "stat": "money", "value": -150, "label": "-$150 Cash" }
+          ]
+        }
+      },
+      {
+        "text": "Offer free month",
+        "description": "Give affected users a free month to retain them.",
+        "effects": { "reputation": 15, "money": -300 },
+        "impact": {
+          "immediate": [
+            { "stat": "reputation", "value": 15, "label": "+15 Reputation" },
+            { "stat": "money", "value": -300, "label": "-$300 Cash" }
+          ]
+        }
+      },
+      {
+        "text": "Ignore reviews",
+        "description": "Reviews will blow over. Focus on growth.",
+        "effects": { "reputation": -30, "users": -200 },
+        "impact": {
+          "immediate": [
+            { "stat": "reputation", "value": -30, "label": "-30 Reputation" },
+            { "stat": "users", "value": -200, "label": "-200 Users" }
+          ],
+          "modifiers": [
+            {
+              "id": "negative-review-backlash",
+              "label": "Negative Review Backlash",
+              "description": "Poor reviews continue to deter new users.",
+              "source": "Negative Reviews",
+              "type": "debuff",
+              "category": "reputation",
+              "durationDays": 5,
+              "startedAtDay": 0,
+              "effects": [
+                { "stat": "reputation", "value": -2, "mode": "flat", "interval": "day", "label": "-2 Reputation/day" },
+                { "stat": "conversionRate", "value": -0.002, "mode": "flat", "label": "-0.2% Conversion" }
+              ]
+            }
+          ]
+        }
+      }
     ]
   },
   {
@@ -229,12 +845,50 @@
     "severity": "critical",
     "delayPenalty": {
       "intervalMs": 2000,
-      "effects": { "reputation": -4, "hype": -2, "techDebt": 2, "bugs": 2 }
+      "effects": { "reputation": -4, "hype": -2, "bugs": 2 }
     },
     "choices": [
-      { "text": "Emergency hotfix", "effects": { "performance": 25, "reputation": 15, "money": -100 } },
-      { "text": "Full investigation", "effects": { "performance": 20, "techDebt": -15, "money": -200 } },
-      { "text": "Quick patch", "effects": { "performance": 10, "techDebt": 15 } }
+      {
+        "text": "Emergency hotfix",
+        "description": "Drop everything and patch the bug immediately.",
+        "effects": { "performance": 25, "reputation": 15, "money": -100 },
+        "impact": {
+          "immediate": [
+            { "stat": "performance", "value": 25, "label": "+25 Stability" },
+            { "stat": "reputation", "value": 15, "label": "+15 Reputation" },
+            { "stat": "money", "value": -100, "label": "-$100 Cash" }
+          ]
+        }
+      },
+      {
+        "text": "Full investigation",
+        "description": "Find the root cause and fix it properly.",
+        "effects": { "performance": 20, "techDebt": -15, "money": -200 },
+        "impact": {
+          "immediate": [
+            { "stat": "performance", "value": 20, "label": "+20 Stability" },
+            { "stat": "techDebt", "value": -15, "label": "-15 Tech Debt" },
+            { "stat": "money", "value": -200, "label": "-$200 Cash" }
+          ],
+          "risks": [
+            { "risk": "bugSpike", "value": -0.3, "label": "-30% Future Bug Risk" }
+          ]
+        }
+      },
+      {
+        "text": "Quick patch",
+        "description": "Apply a temporary workaround without full testing.",
+        "effects": { "performance": 10, "techDebt": 15 },
+        "impact": {
+          "immediate": [
+            { "stat": "performance", "value": 10, "label": "+10 Stability" },
+            { "stat": "techDebt", "value": 15, "label": "+15 Tech Debt" }
+          ],
+          "risks": [
+            { "risk": "bugSpike", "value": 0.25, "label": "+25% Bug Risk" }
+          ]
+        }
+      }
     ]
   },
   {
@@ -249,9 +903,69 @@
       "effects": { "techDebt": 2, "reputation": -2 }
     },
     "choices": [
-      { "text": "Dedicated refactor sprint", "effects": { "techDebt": -25, "performance": 15, "money": -250 } },
-      { "text": "Incremental cleanup", "effects": { "techDebt": -15, "performance": 10 } },
-      { "text": "Ship more features", "effects": { "techDebt": 20, "hype": 10 } }
+      {
+        "text": "Dedicated refactor sprint",
+        "description": "Pause features and clean up the codebase.",
+        "effects": { "techDebt": -25, "performance": 15, "money": -250 },
+        "impact": {
+          "immediate": [
+            { "stat": "techDebt", "value": -25, "label": "-25 Tech Debt" },
+            { "stat": "performance", "value": 15, "label": "+15 Stability" },
+            { "stat": "money", "value": -250, "label": "-$250 Cash" }
+          ],
+          "modifiers": [
+            {
+              "id": "refactored-codebase",
+              "label": "Refactored Codebase",
+              "description": "Cleaner code enables faster development.",
+              "source": "Technical Debt Crisis",
+              "type": "buff",
+              "category": "product",
+              "effects": [
+                { "stat": "performance", "value": 1, "mode": "flat", "interval": "day", "label": "+1 Stability/day" }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "text": "Incremental cleanup",
+        "description": "Clean up code as you build new features.",
+        "effects": { "techDebt": -15, "performance": 10 },
+        "impact": {
+          "immediate": [
+            { "stat": "techDebt", "value": -15, "label": "-15 Tech Debt" },
+            { "stat": "performance", "value": 10, "label": "+10 Stability" }
+          ]
+        }
+      },
+      {
+        "text": "Ship more features",
+        "description": "Technical debt can wait. Users want features.",
+        "effects": { "techDebt": 20, "hype": 10 },
+        "impact": {
+          "immediate": [
+            { "stat": "techDebt", "value": 20, "label": "+20 Tech Debt" },
+            { "stat": "hype", "value": 10, "label": "+10 Hype" }
+          ],
+          "modifiers": [
+            {
+              "id": "growing-tech-debt",
+              "label": "Growing Technical Debt",
+              "description": "Code quality continues to degrade.",
+              "source": "Technical Debt Crisis",
+              "type": "debuff",
+              "category": "product",
+              "durationDays": 5,
+              "startedAtDay": 0,
+              "effects": [
+                { "stat": "techDebt", "value": 2, "mode": "flat", "interval": "day", "label": "+2 Tech Debt/day" },
+                { "stat": "performance", "value": -1, "mode": "flat", "interval": "day", "label": "-1 Stability/day" }
+              ]
+            }
+          ]
+        }
+      }
     ]
   },
   {
@@ -266,9 +980,52 @@
       "effects": { "money": -150, "reputation": -1 }
     },
     "choices": [
-      { "text": "Take the meeting", "effects": { "money": 2000, "reputation": 15 } },
-      { "text": "Negotiate better terms", "effects": { "money": 3000, "reputation": -5 } },
-      { "text": "Bootstrapping forever", "effects": { "reputation": 20, "hype": 15 } }
+      {
+        "text": "Take the meeting",
+        "description": "Present your metrics and growth story.",
+        "effects": { "money": 2000, "reputation": 15 },
+        "impact": {
+          "immediate": [
+            { "stat": "money", "value": 2000, "label": "+$2,000 Cash" },
+            { "stat": "reputation", "value": 15, "label": "+15 Reputation" }
+          ]
+        }
+      },
+      {
+        "text": "Negotiate better terms",
+        "description": "Push for a higher valuation before committing.",
+        "effects": { "money": 3000, "reputation": -5 },
+        "impact": {
+          "immediate": [
+            { "stat": "money", "value": 3000, "label": "+$3,000 Cash" },
+            { "stat": "reputation", "value": -5, "label": "-5 Reputation" }
+          ]
+        }
+      },
+      {
+        "text": "Bootstrapping forever",
+        "description": "Decline funding and stay independent.",
+        "effects": { "reputation": 20, "hype": 15 },
+        "impact": {
+          "immediate": [
+            { "stat": "reputation", "value": 20, "label": "+20 Reputation" },
+            { "stat": "hype", "value": 15, "label": "+15 Hype" }
+          ],
+          "modifiers": [
+            {
+              "id": "bootstrapped-pride",
+              "label": "Bootstrapped Pride",
+              "description": "The indie hacker community respects your independence.",
+              "source": "Investor Interest",
+              "type": "buff",
+              "category": "reputation",
+              "effects": [
+                { "stat": "reputation", "value": 1, "mode": "flat", "interval": "day", "label": "+1 Reputation/day" }
+              ]
+            }
+          ]
+        }
+      }
     ]
   },
   {
@@ -283,9 +1040,59 @@
       "effects": { "money": -150, "reputation": -2 }
     },
     "choices": [
-      { "text": "Differentiate with features", "effects": { "money": -300, "reputation": 20, "hype": 15 } },
-      { "text": "Price war", "effects": { "money": -500, "users": 500, "reputation": -15 } },
-      { "text": "Focus on community", "effects": { "reputation": 15, "hype": 20 } }
+      {
+        "text": "Differentiate with features",
+        "description": "Build unique features the competitor doesn't have.",
+        "effects": { "money": -300, "reputation": 20, "hype": 15 },
+        "impact": {
+          "immediate": [
+            { "stat": "money", "value": -300, "label": "-$300 Cash" },
+            { "stat": "reputation", "value": 20, "label": "+20 Reputation" },
+            { "stat": "hype", "value": 15, "label": "+15 Hype" }
+          ]
+        }
+      },
+      {
+        "text": "Price war",
+        "description": "Lower prices to undercut the competitor.",
+        "effects": { "money": -500, "users": 500, "reputation": -15 },
+        "impact": {
+          "immediate": [
+            { "stat": "money", "value": -500, "label": "-$500 Cash" },
+            { "stat": "users", "value": 500, "label": "+500 Users" },
+            { "stat": "reputation", "value": -15, "label": "-15 Reputation" }
+          ],
+          "recurring": [
+            { "stat": "dailyRevenue", "value": -20, "interval": "day", "label": "-$20/day Revenue" }
+          ]
+        }
+      },
+      {
+        "text": "Focus on community",
+        "description": "Double down on community and open source values.",
+        "effects": { "reputation": 15, "hype": 20 },
+        "impact": {
+          "immediate": [
+            { "stat": "reputation", "value": 15, "label": "+15 Reputation" },
+            { "stat": "hype", "value": 20, "label": "+20 Hype" }
+          ],
+          "modifiers": [
+            {
+              "id": "community-loyalty",
+              "label": "Community Loyalty",
+              "description": "Your community becomes more engaged and vocal.",
+              "source": "Competitor Launched",
+              "type": "buff",
+              "category": "reputation",
+              "durationDays": 7,
+              "startedAtDay": 0,
+              "effects": [
+                { "stat": "reputation", "value": 1, "mode": "flat", "interval": "day", "label": "+1 Reputation/day" }
+              ]
+            }
+          ]
+        }
+      }
     ]
   }
 ]

@@ -5,11 +5,19 @@ import { useSound } from "@/hooks/use-sound";
 import { TerminalPanel } from "@/components/ui/terminal-panel";
 import { useEffect, useState } from "react";
 import { clearTerminalLogs } from "@/hooks/use-terminal-logs";
+import { HowToPlayDialog } from "@/components/game/dialogs/how-to-play-dialog";
+import { Rocket, HelpCircle, Trophy, BookOpen } from "lucide-react";
+import { formatCurrency, formatCompactNumber } from "@/lib/formatters";
 
 export function StartScreen() {
   const startGame = useGameStore((s) => s.startGame);
   const { playClick } = useSound();
   const [theme, setTheme] = useState<"emerald" | "amber" | "cyan">("emerald");
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+
+  // Local storage telemetry
+  const [lastRun, setLastRun] = useState<{ day: number; result: string; cause?: string; users?: number } | null>(null);
+  const [bestRun, setBestRun] = useState<{ users: number; mrr: number } | null>(null);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("terminal-theme") as "emerald" | "amber" | "cyan" | null;
@@ -17,6 +25,10 @@ export function StartScreen() {
       setTheme(savedTheme);
       applyTheme(savedTheme);
     }
+    const savedLast = localStorage.getItem("bos-last-run");
+    if (savedLast) setLastRun(JSON.parse(savedLast));
+    const savedBest = localStorage.getItem("bos-best-run");
+    if (savedBest) setBestRun(JSON.parse(savedBest));
   }, []);
 
   const applyTheme = (t: "emerald" | "amber" | "cyan") => {
@@ -29,140 +41,182 @@ export function StartScreen() {
   const handleThemeChange = (t: "emerald" | "amber" | "cyan") => {
     playClick();
     setTheme(t);
-    applyTheme(t === "emerald" ? "emerald" : t);
+    applyTheme(t);
     localStorage.setItem("terminal-theme", t);
   };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Enter") {
+      if (e.key === "Enter" && !isHelpOpen) {
         clearTerminalLogs();
         startGame();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [startGame]);
+  }, [startGame, isHelpOpen]);
 
   return (
-    <div className="h-screen w-screen flex flex-col items-center justify-center p-6 bg-[#121214] font-mono text-[#e2e8f0] selection:bg-primary selection:text-[#121214]">
-      <div className="w-full max-w-xl space-y-6">
+    <div className="h-screen w-screen flex flex-col items-center justify-center p-6 bg-[#0b0b0f] font-sans text-[#f3f4f6] selection:bg-primary selection:text-[#0b0b0f] overflow-hidden select-none">
+      <div className="w-full max-w-3xl space-y-5">
         
         {/* Terminal Header */}
-        <div className="flex justify-between items-center text-[10px] text-slate-500 border-b border-[#2e2e38] pb-2">
-          <div>SESSION: LOCALHOST://BOS-CLIENT-SHELL</div>
-          <div>ESTABLISHED: {new Date().toLocaleTimeString()}</div>
+        <div className="flex justify-between items-center text-[9px] text-slate-500 border-b border-[#1f1f29] pb-2 font-mono">
+          <div className="flex items-center gap-1.5 font-bold">
+            <Rocket className="size-3.5 text-[#10b981]" />
+            <span>LOCALHOST://BATTLE-OF-SCALING</span>
+          </div>
+          <div>BOS-CONSOLE v0.4.3</div>
         </div>
 
-        {/* Welcome Terminal Panel */}
-        <TerminalPanel title="init_handshake" className="w-full shadow-lg">
-          <div className="space-y-5 text-left py-2">
+        {/* Welcome Dashboard Panel */}
+        <TerminalPanel title="SaaS Strategy Command Console" className="w-full shadow-2xl">
+          <div className="space-y-5 text-left py-1">
             
-            {/* Terminal Command Output */}
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-primary font-bold">$</span>
-                <span className="text-white font-bold">init --game &quot;battle-of-scaling&quot;</span>
-              </div>
-              <div className="text-[10px] text-slate-500">
-                [OK] Shell initialization complete. Accessing simulator library...
-              </div>
+            {/* Title Block */}
+            <div className="text-center sm:text-left">
+              <h1 className="text-2xl font-extrabold text-white tracking-wider flex items-center justify-center sm:justify-start gap-2.5 font-mono">
+                🚀 BATTLE OF SCALING
+              </h1>
+              <p className="text-xs text-slate-400 mt-1.5">
+                Build a SaaS. Survive the traffic. Scale or collapse.
+              </p>
             </div>
 
-            {/* Help Block / Description */}
-            <div className="space-y-3 text-[11px] bg-[#141417] p-3 border border-[#2e2e38]">
-              <div>
-                <span className="text-primary font-bold uppercase">Description:</span>
-                <p className="text-slate-300 mt-1 pl-4 leading-relaxed">
-                  Grow a SaaS startup from 100 users to 1,000,000 in 30 days. Maintain operational cash, manage technical debt, resolve infrastructure incidents, and prevent system loads from bottlenecking growth.
+            {/* Split Grid Details */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              {/* Left: Objective */}
+              <div className="space-y-2.5 text-[11px] bg-[#0b0b0f] p-3.5 border border-[#1f1f29] rounded">
+                <span className="text-[#10b981] font-bold uppercase tracking-wider text-[9px] font-mono block">
+                  Objective Goal
+                </span>
+                <p className="text-slate-300 leading-relaxed">
+                  Reach <strong className="text-white">1,000,000 active users</strong> in 30 days. Don&apos;t let Cash, Stability or Reputation hit zero. Balance scaling speed with technical debt control loops.
                 </p>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 border-t border-[#2e2e38] pt-2 mt-2">
-                <div>
-                  <span className="text-slate-500 block uppercase text-[9px] font-bold">--duration</span>
-                  <span className="text-white">30 Days</span>
-                </div>
-                <div>
-                  <span className="text-slate-500 block uppercase text-[9px] font-bold">--diagnostics</span>
-                  <span className="text-white">7 Stats</span>
-                </div>
-                <div>
-                  <span className="text-slate-500 block uppercase text-[9px] font-bold">--events</span>
-                  <span className="text-white">17 Incidents</span>
-                </div>
+              {/* Right: How the Run Works */}
+              <div className="space-y-2.5 text-[11px] bg-[#0b0b0f] p-3.5 border border-[#1f1f29] rounded">
+                <span className="text-purple-400 font-bold uppercase tracking-wider text-[9px] font-mono block">
+                  How the Run Works
+                </span>
+                <ul className="text-slate-300 space-y-1 pl-1">
+                  <li className="flex items-start gap-1">
+                    <span className="text-[#10b981] font-bold mr-1">1.</span>
+                    <span>Grow users and maximize MRR base.</span>
+                  </li>
+                  <li className="flex items-start gap-1">
+                    <span className="text-[#10b981] font-bold mr-1">2.</span>
+                    <span>Fix bugs and refactor code to maintain stability.</span>
+                  </li>
+                  <li className="flex items-start gap-1">
+                    <span className="text-[#10b981] font-bold mr-1">3.</span>
+                    <span>Keep runway extended against operational costs.</span>
+                  </li>
+                  <li className="flex items-start gap-1">
+                    <span className="text-[#10b981] font-bold mr-1">4.</span>
+                    <span>Resolve priority incidents and strategic events.</span>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+
+            {/* Run Logs / Scoreboard Summary */}
+            <div className="grid grid-cols-2 gap-3 text-[10px]">
+              <div className="bg-[#0b0b0f] border border-[#1f1f29] p-3 rounded">
+                <span className="text-slate-500 uppercase tracking-wider text-[8px] font-bold block mb-1 font-mono">
+                  Last Run Diagnostics
+                </span>
+                {lastRun ? (
+                  <div className="space-y-1 text-slate-300">
+                    <div>Status: <span className={lastRun.result === "won" ? "text-emerald-400 font-bold" : "text-[#f43f5e] font-bold"}>
+                      {lastRun.result === "won" ? "Victory" : "Failed"}
+                    </span></div>
+                    <div>Survived: {lastRun.day} / 30 days</div>
+                    {lastRun.cause && <div className="truncate text-slate-500 text-[9px]">Cause: {lastRun.cause}</div>}
+                  </div>
+                ) : (
+                  <span className="text-slate-500 block italic py-1">No past records.</span>
+                )}
+              </div>
+
+              <div className="bg-[#0b0b0f] border border-[#1f1f29] p-3 rounded">
+                <span className="text-slate-500 uppercase tracking-wider text-[8px] font-bold block mb-1 flex items-center gap-1 font-mono">
+                  <Trophy className="size-3 text-[#f59e0b]" />
+                  Best Run Highscore
+                </span>
+                {bestRun ? (
+                  <div className="space-y-1 text-slate-300">
+                    <div>Users: <span className="text-[#10b981] font-bold">{formatCompactNumber(bestRun.users)}</span></div>
+                    <div>MRR: <span className="text-white font-bold">{formatCurrency(bestRun.mrr)}</span></div>
+                    <div className="text-slate-500 text-[9px]">Escape velocity reached</div>
+                  </div>
+                ) : (
+                  <span className="text-slate-500 block italic py-1">No records yet.</span>
+                )}
               </div>
             </div>
 
-            {/* Start Prompt Actions */}
-            <div className="pt-2 space-y-3">
-              <div className="flex items-center gap-2 text-xs">
-                <span className="text-primary font-bold">$</span>
-                <span className="text-slate-300">npm run dev <span className="text-primary">--theme={theme}</span></span>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                <button
-                  className="px-5 py-2 bg-primary text-[#121214] font-bold text-xs hover:bg-primary/90 active:translate-y-px transition-all cursor-pointer border border-primary font-mono rounded"
-                  onClick={() => {
-                    playClick();
-                    clearTerminalLogs();
-                    startGame();
-                  }}
-                >
-                  [ EXECUTE_DEPLOYMENT ]
-                </button>
-                
-                <span className="text-[10px] text-slate-500 cursor-default animate-pulse">
-                  (Or press Enter to execute)
-                </span>
-              </div>
+            {/* Action Bar */}
+            <div className="pt-2 flex items-center gap-3">
+              <button
+                className="px-6 py-2.5 bg-[#10b981] hover:bg-[#10b981]/90 text-[#0b0b0f] font-bold text-[10px] uppercase rounded cursor-pointer transition-all shadow-md"
+                onClick={() => {
+                  playClick();
+                  clearTerminalLogs();
+                  startGame();
+                }}
+              >
+                Start New Run
+              </button>
+
+              <button
+                className="px-4 py-2.5 border border-[#1f1f29] hover:bg-[#1a1a24] text-slate-300 hover:text-white font-bold text-[10px] uppercase rounded cursor-pointer flex items-center gap-1.5 transition-all"
+                onClick={() => {
+                  playClick();
+                  setIsHelpOpen(true);
+                }}
+              >
+                <HelpCircle className="size-3.5" />
+                How to Play
+              </button>
+
+              <span className="text-[9px] text-slate-500 hidden sm:inline ml-1.5 animate-pulse font-mono">
+                (Or press Enter to execute)
+              </span>
             </div>
 
           </div>
         </TerminalPanel>
 
-        {/* Theme Settings Selector CLI-Style */}
-        <div className="flex justify-between items-center text-[10px] text-slate-500 border-t border-[#2e2e38] pt-4">
+        {/* Theme Settings Selector */}
+        <div className="flex justify-between items-center text-[9px] text-slate-500 border-t border-[#1f1f29] pt-4 font-mono">
           <div className="flex items-center gap-1.5">
-            <span>SET COLOR PROFILE:</span>
+            <span>BRAND COLORWAY:</span>
             <div className="flex gap-1.5 font-bold">
-              <button
-                onClick={() => handleThemeChange("emerald")}
-                className={`px-1.5 py-0.5 border cursor-pointer rounded-sm ${
-                  theme === "emerald"
-                    ? "bg-primary text-[#121214] border-primary"
-                    : "border-neutral-800 hover:border-neutral-700 text-slate-400"
-                }`}
-              >
-                emerald
-              </button>
-              <button
-                onClick={() => handleThemeChange("amber")}
-                className={`px-1.5 py-0.5 border cursor-pointer rounded-sm ${
-                  theme === "amber"
-                    ? "bg-primary text-[#121214] border-primary"
-                    : "border-neutral-800 hover:border-neutral-700 text-slate-400"
-                }`}
-              >
-                amber
-              </button>
-              <button
-                onClick={() => handleThemeChange("cyan")}
-                className={`px-1.5 py-0.5 border cursor-pointer rounded-sm ${
-                  theme === "cyan"
-                    ? "bg-primary text-[#121214] border-primary"
-                    : "border-neutral-800 hover:border-neutral-700 text-slate-400"
-                }`}
-              >
-                cyan
-              </button>
+              {["emerald", "amber", "cyan"].map((t) => (
+                <button
+                  key={t}
+                  onClick={() => handleThemeChange(t as any)}
+                  className={`px-2 py-0.5 border cursor-pointer rounded-sm uppercase ${
+                    theme === t
+                      ? "bg-primary text-[#0b0b0f] border-primary"
+                      : "border-neutral-800 hover:border-neutral-700 text-slate-400"
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
             </div>
           </div>
-          <div>BOS-AGENT SHELL v1.0.4</div>
+          <div>BOS PORT ENGINE</div>
         </div>
 
       </div>
+
+      <HowToPlayDialog isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </div>
   );
 }

@@ -8,10 +8,12 @@ import {
   advanceDay,
   reseedRng,
 } from "../engine";
+import type { GrowthAction, CampaignResult } from "../growth/campaigns";
+import { runGrowthCampaign } from "../growth/outcome";
 
 interface ActivityLogEntry {
   day: number;
-  type: "event" | "decision" | "economy" | "warning" | "critical";
+  type: "event" | "decision" | "economy" | "warning" | "critical" | "campaign";
   message: string;
 }
 
@@ -19,11 +21,14 @@ interface GameStore extends GameState {
   newUsersToday: number;
   lastDailyBalance: number;
   activityLogs: ActivityLogEntry[];
+  lastCampaignResult: CampaignResult | null;
   startGame: () => void;
   tick: (now: number) => void;
   choose: (choiceIndex: number) => void;
+  runCampaign: (action: GrowthAction) => CampaignResult | null;
   restart: () => void;
   dismissFeedback: () => void;
+  dismissCampaignResult: () => void;
   applyDelayPenaltyIfDue: (now: number) => void;
   addLog: (type: ActivityLogEntry["type"], message: string) => void;
 }
@@ -33,6 +38,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   newUsersToday: 0,
   lastDailyBalance: 0,
   activityLogs: [],
+  lastCampaignResult: null,
 
   addLog: (type, message) => {
     const state = get();
@@ -97,9 +103,48 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ ...next, activityLogs: logs });
   },
 
+  runCampaign: (action: GrowthAction) => {
+    const state = get();
+    if (state.money < action.cost) return null;
+    if (state.status !== "running" && state.status !== "decision") return null;
+
+    const result = runGrowthCampaign(state, action);
+    const logs = [...state.activityLogs.slice(-49)];
+
+    let next: GameState = {
+      ...state,
+      money: state.money - action.cost,
+      users: state.users + result.acquiredUsers,
+    };
+
+    if (result.outcome === "backfire") {
+      next.performance = Math.max(0, next.performance - 8);
+      next.reputation = Math.max(0, next.reputation - 5);
+      next.bugs = Math.min(100, next.bugs + 5);
+    } else if (result.outcome === "failure") {
+      next.performance = Math.max(0, next.performance - 3);
+    }
+
+    logs.push({
+      day: state.day,
+      type: "campaign",
+      message: `${action.label}: ${result.outcome} (+${result.acquiredUsers} users, CAC $${Math.round(result.cac)})`,
+    });
+
+    set({
+      ...next,
+      lastCampaignResult: result,
+      activityLogs: logs,
+    });
+
+    return result;
+  },
+
+  dismissCampaignResult: () => set({ lastCampaignResult: null }),
+
   restart: () => {
     const state = createInitialState(Date.now());
-    set({ ...state, status: "running", activityLogs: [], newUsersToday: 0, lastDailyBalance: 0 });
+    set({ ...state, status: "running", activityLogs: [], newUsersToday: 0, lastDailyBalance: 0, lastCampaignResult: null });
   },
 
   dismissFeedback: () => set({ pendingEffects: null }),
@@ -159,6 +204,8 @@ export function useGameStats() {
       runwayDays: s.runwayDays,
       conversionRate: s.conversionRate,
       arpu: s.arpu,
+      cac: s.cac,
+      acquisitionReadiness: s.acquisitionReadiness,
       dailyExpensesBreakdown: s.dailyExpensesBreakdown,
       dailyRevenueBreakdown: s.dailyRevenueBreakdown,
       performance: s.performance,
